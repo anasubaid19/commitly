@@ -204,7 +204,7 @@ body{
 
 /* Task items */
 .task-list{display:flex;flex-direction:column;gap:6px}
-.task-item{background:var(--surface-1);border:1px solid var(--border-sub);border-radius:var(--r-md);padding:13px 14px 13px 16px;display:flex;align-items:flex-start;gap:12px;transition:border-color 0.18s,opacity 0.25s;animation:fadeSlideIn 0.22s ease;position:relative;overflow:hidden}
+.task-item{background:var(--surface-1);border:1px solid var(--border-sub);border-radius:var(--r-md);padding:13px 14px 13px 16px;display:flex;align-items:flex-start;gap:12px;transition:border-color 0.18s,opacity 0.25s,transform 0.25s cubic-bezier(0.4,0,0.2,1);position:relative;overflow:hidden}
 @keyframes fadeSlideIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
 .task-item:hover{border-color:var(--border-mid)}
 .task-item.is-done{opacity:0.45}
@@ -335,6 +335,57 @@ body{
   .month-cell{min-height:42px;padding:6px 4px}
   .mc-count{font-size:12px}
 }
+/* ── SWIPE CONTAINER ── */
+.task-swipe-wrap{position:relative;border-radius:var(--r-md);overflow:hidden;animation:fadeSlideIn 0.22s ease}
+.swipe-bg{position:absolute;inset:0;display:flex;align-items:center;border-radius:var(--r-md);pointer-events:none;opacity:0;transition:opacity 0.1s}
+.swipe-bg-del{background:linear-gradient(to left,rgba(255,92,92,0.18),rgba(255,92,92,0.05));justify-content:flex-end;padding-right:22px}
+.swipe-bg-edit{background:linear-gradient(to right,rgba(24,226,153,0.15),rgba(24,226,153,0.03));justify-content:flex-start;padding-left:22px}
+.swipe-action-lbl{font-family:var(--mono);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.swipe-bg-del .swipe-action-lbl{color:var(--red)}
+.swipe-bg-edit .swipe-action-lbl{color:var(--brand)}
+.swipe-action-lbl span{font-size:18px}
+.task-swipe-wrap .task-item{position:relative;z-index:1;will-change:transform;margin-bottom:0;animation:none}
+
+/* ── EDIT MODAL ── */
+.edit-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:700;display:none;place-items:center;backdrop-filter:blur(8px)}
+.edit-overlay.on{display:grid}
+.edit-modal{background:var(--surface-1);border:1px solid var(--border-str);border-radius:var(--r-lg);padding:28px;width:480px;max-width:92vw;animation:popIn 0.2s cubic-bezier(0.4,0,0.2,1);box-shadow:var(--shadow),0 0 40px rgba(0,0,0,0.5)}
+.edit-modal-title{font-size:15px;font-weight:600;color:var(--text-pri);letter-spacing:-0.3px;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.edit-modal-title span{font-family:var(--mono);font-size:11px;color:var(--brand);background:var(--brand-dim);border-radius:var(--r-pill);padding:2px 10px;font-weight:600}
+.edit-field-label{font-size:11px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.65px;margin-bottom:8px}
+.edit-text-input{width:100%;background:var(--surface-2);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:12px 16px;font-family:var(--sans);font-size:15px;color:var(--text-pri);outline:none;margin-bottom:16px;transition:border-color 0.2s,box-shadow 0.2s;resize:none;line-height:1.5}
+.edit-text-input:focus{border-color:rgba(24,226,153,0.4);box-shadow:0 0 0 3px rgba(24,226,153,0.08)}
+.edit-row{display:flex;gap:10px;margin-bottom:20px}
+.edit-select{flex:1;background:var(--surface-2);border:1px solid var(--border-mid);border-radius:var(--r-md);padding:10px 12px;font-family:var(--sans);font-size:14px;color:var(--text-sec);outline:none;-webkit-appearance:none;transition:border-color 0.2s}
+.edit-select:focus{border-color:rgba(24,226,153,0.4)}
+.edit-select option{background:var(--surface-2);color:var(--text-pri)}
+.edit-actions{display:flex;gap:8px;justify-content:flex-end}
+.edit-save{background:var(--brand);color:#050a06;border:none;border-radius:var(--r-pill);padding:10px 24px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation;transition:opacity 0.15s}
+.edit-save:hover{opacity:0.88}
+.edit-cancel{background:var(--surface-2);border:1px solid var(--border-mid);border-radius:var(--r-pill);padding:10px 20px;font-family:var(--sans);font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;touch-action:manipulation;transition:border-color 0.15s,color 0.15s}
+.edit-cancel:hover{border-color:var(--border-str);color:var(--text-pri)}
+
+/* ── IMPORT / EXPORT ── */
+.io-btns{display:flex;gap:6px;align-items:center}
+.io-btn{background:var(--surface-1);border:1px solid var(--border-sub);border-radius:var(--r-pill);padding:6px 13px;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text-muted);cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;transition:all 0.15s;touch-action:manipulation;display:flex;align-items:center;gap:5px}
+.io-btn:hover{border-color:var(--border-str);color:var(--text-pri)}
+.io-btn.export:hover{border-color:rgba(91,141,238,0.4);color:var(--blue)}
+.io-btn.import:hover{border-color:rgba(24,226,153,0.4);color:var(--brand)}
+
+/* ── UNDO TOAST (override) ── */
+.toast-undo{background:transparent;border:none;color:var(--brand);font-family:var(--sans);font-size:12px;font-weight:700;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+
+/* ── TASK DELETE ANIMATION ── */
+@keyframes taskSlideOut{from{opacity:1;transform:translateX(0);max-height:80px}to{opacity:0;transform:translateX(-60px);max-height:0;margin:0;padding:0}}
+.task-removing{animation:taskSlideOut 0.28s ease forwards}
+
+/* mobile edit modal */
+@media(max-width:640px){
+  .edit-modal{border-radius:var(--r-lg) var(--r-lg) 0 0;padding:20px 16px 32px;width:100%;max-width:100%}
+  .edit-overlay{align-items:flex-end}
+  .io-btn{padding:5px 10px;font-size:9px}
+}
+
 </style>
 </head>
 <body>
@@ -342,6 +393,38 @@ body{
 <div class="tooltip" id="tip"></div>
 <div class="toast-wrap" id="toastWrap"></div>
 
+
+<!-- Edit Modal -->
+<div class="edit-overlay" id="editOverlay">
+  <div class="edit-modal">
+    <div class="edit-modal-title">Edit Task <span>Swipe ➜</span></div>
+    <div class="edit-field-label">Task</div>
+    <textarea class="edit-text-input" id="editTextInput" rows="2" maxlength="200"></textarea>
+    <div class="edit-field-label">Details</div>
+    <div class="edit-row">
+      <select class="edit-select" id="editPriSel">
+        <option value="none">— Priority</option>
+        <option value="high">🔴 High</option>
+        <option value="medium">🟡 Medium</option>
+        <option value="low">🔵 Low</option>
+      </select>
+      <select class="edit-select" id="editCatSel">
+        <option value="general">General</option>
+        <option value="work">Work</option>
+        <option value="personal">Personal</option>
+        <option value="learning">Learning</option>
+        <option value="design">Design</option>
+        <option value="health">Health</option>
+      </select>
+    </div>
+    <div class="edit-actions">
+      <button class="edit-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="edit-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+<!-- Hidden import file input -->
+<input type="file" id="importFileInput" accept=".json" style="display:none">
 <!-- Day Modal -->
 <div class="overlay" id="overlay">
   <div class="modal">
@@ -380,6 +463,10 @@ body{
     <div class="header-meta">
       <div class="header-greeting" id="greeting"></div>
       <div class="header-date" id="headerDate"></div>
+      <div class="io-btns" style="margin-top:6px">
+        <button class="io-btn export" onclick="exportData()" title="Export backup">↑ Export</button>
+        <button class="io-btn import" onclick="document.getElementById('importFileInput').click()" title="Import backup">↓ Import</button>
+      </div>
     </div>
   </header>
 
@@ -777,6 +864,11 @@ function updateHeatmapSub() {
   }
 }
 
+function scrollHeatmapToEnd() {
+  const s = document.querySelector('.heatmap-scroll');
+  if (s) requestAnimationFrame(()=>{ s.scrollLeft = s.scrollWidth; });
+}
+
 /* ============================================================
    HEATMAP VIEW SWITCH
 ============================================================ */
@@ -787,7 +879,7 @@ function setHeatView(mode) {
   document.getElementById('yearView').style.display=mode==='year'?'':'none';
   document.getElementById('monthView').classList.toggle('show',mode==='month');
   document.getElementById('monthNav').classList.toggle('show',mode==='month');
-  if (mode==='year') renderYearHeatmap();
+  if (mode==='year') { renderYearHeatmap(); scrollHeatmapToEnd(); }
   else renderMonthHeatmap();
 }
 
@@ -848,6 +940,23 @@ function animateLogo() {
    TASK ELEMENT
 ============================================================ */
 function makeTask(t, showDate=false, isOverdue=false) {
+  // Swipe wrapper
+  const wrap=document.createElement('div');
+  wrap.className='task-swipe-wrap';
+  wrap.id='tw-'+t.id;
+
+  // Left background: delete (swipe left)
+  const bgDel=document.createElement('div');
+  bgDel.className='swipe-bg swipe-bg-del';
+  bgDel.innerHTML='<div class="swipe-action-lbl"><span>🗑</span>Delete</div>';
+  wrap.appendChild(bgDel);
+
+  // Right background: edit (swipe right)
+  const bgEdit=document.createElement('div');
+  bgEdit.className='swipe-bg swipe-bg-edit';
+  bgEdit.innerHTML='<div class="swipe-action-lbl"><span>✎</span>Edit</div>';
+  wrap.appendChild(bgEdit);
+
   const el=document.createElement('div');
   el.className='task-item'+(t.done?' is-done':'')+(isOverdue?' is-overdue':'');
   el.id='t-'+t.id;
@@ -901,7 +1010,9 @@ function makeTask(t, showDate=false, isOverdue=false) {
   del.onclick=()=>deleteTask(t.id);
   acts.appendChild(del);
   el.appendChild(acts);
-  return el;
+  wrap.appendChild(el);
+  initSwipe(wrap, t.id);
+  return wrap;
 }
 
 /* ============================================================
@@ -1184,17 +1295,219 @@ function toggleTask(id) {
   }
 }
 
-function deleteTask(id) {
-  const t=S.tasks.find(x=>x.id===id);
-  const dstr=t?.date;
-  S.tasks=S.tasks.filter(x=>x.id!==id);
+/* ── DELETE WITH UNDO ── */
+const deleteBuf = {}; // {id: {task, timer}}
+
+function deleteTask(id, skipAnim=false) {
+  const task = S.tasks.find(x => x.id === id);
+  if (!task) return;
+  const dstr = task.date;
+
+  // Animate wrapper out
+  const wrap = document.getElementById('tw-' + id);
+  if (wrap && !skipAnim) {
+    wrap.classList.add('task-removing');
+    setTimeout(() => wrap?.remove(), 280);
+  } else if (wrap) {
+    wrap.remove();
+  }
+
+  // Immediately remove from state + save
+  S.tasks = S.tasks.filter(x => x.id !== id);
   save();
-  renderView();
-  if (dstr) {
+  renderStats();
+
+  // Store in undo buffer
+  if (deleteBuf[id]) clearTimeout(deleteBuf[id].timer);
+  const timer = setTimeout(() => {
+    delete deleteBuf[id];
     if (heatView==='year') refreshYearCell(dstr);
     else renderMonthHeatmap();
+  }, 4500);
+  deleteBuf[id] = { task, dstr, timer };
+
+  // Toast with undo
+  toastWithUndo(id, dstr);
+}
+
+function undoDelete(id) {
+  const entry = deleteBuf[id];
+  if (!entry) return;
+  clearTimeout(entry.timer);
+  delete deleteBuf[id];
+  S.tasks.push(entry.task);
+  S.tasks.sort((a,b)=>a.id-b.id);
+  save();
+  renderView();
+  if (heatView==='year') refreshYearCell(entry.dstr);
+  else refreshMonthCell(entry.dstr);
+  toast('Task restored ✓','success');
+}
+
+function toastWithUndo(id, dstr) {
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.id = 'undo-toast-' + id;
+  t.innerHTML = `<span>Task deleted</span><button class="toast-undo" onclick="undoDelete(${id});document.getElementById('undo-toast-${id}')?.remove()">Undo</button>`;
+  w.appendChild(t);
+  setTimeout(() => {
+    const el = document.getElementById('undo-toast-' + id);
+    if (el) { el.style.opacity='0'; el.style.transition='opacity 0.3s'; setTimeout(()=>el?.remove(),300); }
+  }, 4200);
+}
+
+/* ── EDIT TASK ── */
+let editingId = null;
+
+function openEditModal(id) {
+  const task = S.tasks.find(x => x.id === id);
+  if (!task) return;
+  editingId = id;
+  document.getElementById('editTextInput').value = task.text;
+  document.getElementById('editPriSel').value = task.priority || 'none';
+  document.getElementById('editCatSel').value = task.category || 'general';
+  document.getElementById('editOverlay').classList.add('on');
+  setTimeout(()=>document.getElementById('editTextInput').focus(), 100);
+}
+
+function closeEditModal() {
+  editingId = null;
+  document.getElementById('editOverlay').classList.remove('on');
+}
+
+function saveEdit() {
+  if (!editingId) return;
+  const task = S.tasks.find(x => x.id === editingId);
+  if (!task) return;
+  const newText = document.getElementById('editTextInput').value.trim();
+  if (!newText) return;
+  task.text = newText;
+  task.priority = document.getElementById('editPriSel').value;
+  task.category = document.getElementById('editCatSel').value;
+  save();
+  closeEditModal();
+  renderView();
+  toast('Task updated ✓','success');
+}
+
+document.getElementById('editOverlay').addEventListener('click', e => {
+  if (e.target.id === 'editOverlay') closeEditModal();
+});
+document.getElementById('editTextInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) saveEdit();
+  if (e.key === 'Escape') closeEditModal();
+});
+
+/* ── SWIPE GESTURE ── */
+function initSwipe(wrap, taskId) {
+  const item = wrap.querySelector('.task-item');
+  const bgDel = wrap.querySelector('.swipe-bg-del');
+  const bgEdit = wrap.querySelector('.swipe-bg-edit');
+  const THRESHOLD = 72;
+  let startX=0, startY=0, curX=0, dragging=false, dir=null;
+
+  function onStart(e) {
+    const pt = e.touches?.[0] || e;
+    startX=pt.clientX; startY=pt.clientY;
+    curX=0; dragging=true; dir=null;
+    item.style.transition='none';
   }
-  toast('Task deleted','');
+
+  function onMove(e) {
+    if (!dragging) return;
+    const pt = e.touches?.[0] || e;
+    const dx = pt.clientX - startX;
+    const dy = pt.clientY - startY;
+    if (!dir) {
+      if (Math.abs(dx)<4&&Math.abs(dy)<4) return;
+      dir = Math.abs(dx)>Math.abs(dy) ? 'h' : 'v';
+    }
+    if (dir==='v') return;
+    e.preventDefault();
+    curX = dx;
+    const clamped = Math.max(-THRESHOLD*1.6, Math.min(THRESHOLD*1.6, dx));
+    item.style.transform = `translateX(${clamped}px)`;
+    const prog = Math.min(1, Math.abs(dx)/THRESHOLD);
+    if (dx < -6) { bgDel.style.opacity=prog; bgEdit.style.opacity=0; }
+    else if (dx > 6) { bgEdit.style.opacity=prog; bgDel.style.opacity=0; }
+    else { bgDel.style.opacity=0; bgEdit.style.opacity=0; }
+  }
+
+  function onEnd() {
+    if (!dragging) return;
+    dragging=false;
+    const dx = curX;
+    item.style.transition='transform 0.25s cubic-bezier(0.4,0,0.2,1)';
+    item.style.transform='translateX(0)';
+    bgDel.style.opacity=0; bgEdit.style.opacity=0;
+    if (dx < -THRESHOLD) {
+      deleteTask(taskId);
+    } else if (dx > THRESHOLD) {
+      openEditModal(taskId);
+    }
+    curX=0;
+  }
+
+  item.addEventListener('touchstart', onStart, {passive:true});
+  item.addEventListener('touchmove',  onMove,  {passive:false});
+  item.addEventListener('touchend',   onEnd);
+  // Desktop mouse support
+  let mouseDown=false;
+  item.addEventListener('mousedown', e=>{ if(e.button!==0)return; onStart(e); mouseDown=true; });
+  window.addEventListener('mousemove', e=>{ if(mouseDown) onMove(e); });
+  window.addEventListener('mouseup',   e=>{ if(mouseDown){ mouseDown=false; onEnd(); } });
+}
+
+/* ── IMPORT / EXPORT ── */
+function exportData() {
+  const payload = {
+    _version: 3,
+    _exported: new Date().toISOString(),
+    _app: 'Commitly',
+    ...S
+  };
+  const json = JSON.stringify(payload, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `commitly-backup-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Backup exported ↑','success');
+}
+
+function importData() {
+  const file = document.getElementById('importFileInput').files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      // Validate structure
+      if (!Array.isArray(data.tasks) || typeof data.nid !== 'number') {
+        toast('Invalid backup file',''); return;
+      }
+      const count = data.tasks.length;
+      if (!confirm(`Import ${count} tasks from backup?\nThis will REPLACE all current data.`)) return;
+      S = { tasks: data.tasks, nid: data.nid };
+      save();
+      renderHeatmapView();
+      renderView();
+      toast(`Imported ${count} tasks ✓`,'success');
+    } catch {
+      toast('Failed to read file','');
+    }
+    // Reset input so same file can be re-imported
+    document.getElementById('importFileInput').value='';
+  };
+  reader.readAsText(file);
+}
+
+function renderHeatmapView() {
+  if (heatView==='year') renderYearHeatmap();
+  else renderMonthHeatmap();
 }
 
 /* ============================================================
@@ -1255,10 +1568,12 @@ function init() {
     new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 
   document.getElementById('taskInput').addEventListener('keydown',e=>{ if(e.key==='Enter') addTask(); });
+  document.getElementById('importFileInput').addEventListener('change', importData);
   document.getElementById('addBtn').addEventListener('click',addTask);
 
   // Default: year view
   setHeatView('year');
+  setTimeout(scrollHeatmapToEnd, 50);
   renderView();
 
   // Evening streak reminder

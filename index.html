@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commitly — Your Daily Commit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   Dark base · Mintlify grammar · Identity preserved
+============================================================ */
+:root {
+  /* Surfaces */
+  --bg:          #090c10;
+  --surface-0:   #0d1117;
+  --surface-1:   #111620;
+  --surface-2:   #161d29;
+
+  /* Borders — opacity-based, Mintlify style */
+  --border-sub:  rgba(255,255,255,0.05);
+  --border-mid:  rgba(255,255,255,0.08);
+  --border-str:  rgba(255,255,255,0.12);
+
+  /* Text */
+  --text-pri:    #edf2f7;
+  --text-sec:    #8b96a8;
+  --text-muted:  #4a5568;
+  --text-dim:    #2d3748;
+
+  /* Brand — Mintlify mint, not GitHub green */
+  --brand:       #18E299;
+  --brand-dim:   rgba(24,226,153,0.12);
+  --brand-glow:  rgba(24,226,153,0.25);
+
+  /* Heatmap levels */
+  --h0: #0d1117;
+  --h1: #0a3020;
+  --h2: #0d5c35;
+  --h3: #12994f;
+  --h4: #18E299;
+
+  /* Semantic */
+  --red:    #ff5c5c;
+  --amber:  #f5a623;
+  --blue:   #5b8dee;
+
+  /* Radius — Mintlify grammar */
+  --r-sm:   6px;
+  --r-md:   12px;
+  --r-lg:   18px;
+  --r-pill: 9999px;
+
+  /* Type */
+  --sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.2);
+  --shadow-glow: 0 0 20px var(--brand-glow);
+}
+
+/* ============================================================
+   RESET & BASE
+============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text-pri);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* Subtle noise texture for depth */
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(24,226,153,0.06) 0%, transparent 60%);
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-str); border-radius: var(--r-pill); }
+
+/* ============================================================
+   LAYOUT
+============================================================ */
+.app {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 24px 96px;
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 48px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-md);
+  background: var(--brand-dim);
+  border: 1px solid rgba(24,226,153,0.2);
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-mark::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, rgba(24,226,153,0.3), transparent 70%);
+}
+
+.logo-mark-grid {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.logo-mark-cell {
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--brand);
+  opacity: 0.3;
+}
+.logo-mark-cell.lit { opacity: 1; }
+
+.wordmark {
+  font-family: var(--sans);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  color: var(--text-pri);
+}
+.wordmark span { color: var(--brand); }
+
+.header-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.header-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+}
+.header-greeting {
+  font-size: 12px;
+  color: var(--text-sec);
+  font-weight: 500;
+}
+
+/* ============================================================
+   STATS — Mintlify: negative letter-spacing on large numbers
+============================================================ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 32px;
+}
+
+.stat-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-sub);
+  border-radius: var(--r-lg);
+  padding: 20px 18px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s, transform 0.2s;
+  cursor: default;
+}
+.stat-card:hover {
+  border-color: var(--border-mid);
+  transform: translateY(-1px);
+}
+.stat-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--brand-dim), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.stat-card:hover::after { opacity: 1; }
+
+.stat-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.65px;
+  margin-bottom: 10px;
+}
+
+/* Mintlify: tight negative tracking at display sizes */
+.stat-value {
+  font-family: var(--mono);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -1.5px;
+  color: var(--text-pri);
+  margin-bottom: 4px;
+}
+
+.stat-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.stat-card.s-today .stat-value { color: var(--brand); }
+.stat-card.s-streak .stat-value { color: var(--amber); }
+.stat-card.s-total .stat-value { color: var(--blue); }
+
+.stat-card.s-today { border-color: rgba(24,226,153,0.1); }
+.stat-card.s-streak { border-color: rgba(245,166,35,0.1); }
+.stat-card.s-total { border-color: rgba(91,141,238,0.1); }
+
+/* ============================================================
+   HEATMAP
+============================================================ */
+.heatmap-card {
+  background: var(--surface-1);
+  border: 1px solid var(--border-sub);
+  border-radius: var(--r-lg);
+  padding: 24px;
+  margin-bottom: 32px;
+  overflow: hidden;
+  position: relative;
+}
+
+.heatmap-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  background: radial-gradient(circle, rgba(24,226,153,0.06), transparent 70%);
+  pointer-events: none;
+}
+
+.heatmap-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.heatmap-title-wrap {}
+.heatmap-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-pri);
+  letter-spacing: -0.2px;
+  margin-bottom: 3px;
+}
+.heatmap-subtitle {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.2px;
+}
+
+.heatmap-scroll { overflow-x: auto; }
+.heatmap-inner {
+  display: flex;
+  gap: 8px;
+  min-width: max-content;
+  padding-bottom: 2px;
+}
+
+.day-labels {
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+  gap: 0;
+}
+.day-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  height: 12px;
+  line-height: 12px;
+  margin-bottom: 2px;
+  width: 22px;
+  text-align: right;
+  padding-right: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.heatmap-cols-wrap {}
+.month-row {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 5px;
+}
+.month-lbl {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  width: 12px; /* harus sama persis dengan .cell width */
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  overflow: visible;
+}
+
+.heatmap-cols { display: flex; gap: 2px; }
+.heatmap-col { display: flex; flex-direction: column; gap: 2px; }
+
+.cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.12s;
+  flex-shrink: 0;
+  position: relative;
+}
+.cell:hover {
+  transform: scale(1.5);
+  z-index: 20;
+}
+.cell[data-l="0"] { background: var(--h0); border: 1px solid var(--border-sub); }
+.cell[data-l="1"] { background: var(--h1); }
+.cell[data-l="2"] { background: var(--h2); }
+.cell[data-l="3"] { background: var(--h3); }
+.cell[data-l="4"] { background: var(--h4); box-shadow: 0 0 6px rgba(24,226,153,0.4); }
+
+.cell.is-today {
+  outline: 1.5px solid var(--brand);
+  outline-offset: 1.5px;
+}
+.cell.do-pulse {
+  animation: cellPulse 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+@keyframes cellPulse {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(2); box-shadow: 0 0 12px var(--brand-glow); }
+  100% { transform: scale(1); }
+}
+
+.heatmap-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  margin-top: 12px;
+}
+.legend-txt {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.leg-cell {
+  width: 10px; height: 10px;
+  border-radius: 2px;
+}
+
+/* ============================================================
+   QUICK ADD — full pill inputs, Mintlify grammar
+============================================================ */
+.add-section { margin-bottom: 28px; }
+
+.add-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: var(--surface-1);
+  border: 1px solid var(--border-sub);
+  border-radius: var(--r-pill);
+  padding: 6px 6px 6px 20px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.add-row:focus-within {
+  border-color: rgba(24,226,153,0.4);
+  box-shadow: 0 0 0 3px rgba(24,226,153,0.08);
+}
+
+.add-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-pri);
+  min-width: 0;
+  width: 100%;
+}
+.add-input::placeholder { color: var(--text-muted); }
+
+.add-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border-mid);
+  flex-shrink: 0;
+}
+
+.add-select {
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-sec);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--r-pill);
+  transition: background 0.15s, color 0.15s;
+  -webkit-appearance: none;
+}
+.add-select:hover { background: var(--surface-2); color: var(--text-pri); }
+.add-select option { background: var(--surface-2); color: var(--text-pri); }
+
+/* Mintlify: primary CTA = pill button, dark fill */
+.add-btn {
+  background: var(--brand);
+  color: #050a06;
+  border: none;
+  border-radius: var(--r-pill);
+  padding: 10px 22px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s, box-shadow 0.2s;
+  white-space: nowrap;
+  letter-spacing: -0.1px;
+  flex-shrink: 0;
+}
+.add-btn:hover {
+  opacity: 0.88;
+  box-shadow: 0 4px 16px rgba(24,226,153,0.3);
+}
+.add-btn:active { transform: scale(0.96); }
+
+/* ============================================================
+   TABS — pill style
+============================================================ */
+.tab-row {
+  display: flex;
+  gap: 2px;
+  background: var(--surface-1);
+  border: 1px solid var(--border-sub);
+  border-radius: var(--r-pill);
+  padding: 4px;
+  width: max-content;
+  max-width: 100%;
+  margin-bottom: 24px;
+}
+.tab {
+  background: transparent;
+  border: none;
+  border-radius: var(--r-pill);
+  padding: 7px 18px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.18s;
+  letter-spacing: 0.1px;
+}
+.tab:hover:not(.active) { color: var(--text-sec); }
+.tab.active {
+  background: var(--surface-2);
+  color: var(--text-pri);
+  border: 1px solid var(--border-mid);
+}
+
+/* ============================================================
+   TODAY PROGRESS
+============================================================ */
+.progress-bar-wrap {
+  background: var(--surface-1);
+  border: 1px solid var(--border-sub);
+  border-radius: var(--r-lg);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.progress-left { flex: 1; }
+.progress-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.65px;
+  margin-bottom: 10px;
+}
+.progress-track {
+  height: 5px;
+  background: var(--border-mid);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, var(--brand), rgba(24,226,153,0.7));
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.progress-pct {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--brand);
+  letter-spacing: -1.2px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   SECTION HEADERS
+============================================================ */
+.section-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  margin-top: 20px;
+}
+.section-hd:first-child { margin-top: 0; }
+.section-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.65px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.count-badge {
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--r-pill);
+  padding: 1px 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+/* ============================================================
+   FILTER PILLS
+============================================================ */
+.filter-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.filter-pill {
+  background: var(--surface-1);
+  border: 1px solid var(--border-sub);
+  border-radius: var(--r-pill);
+  padding: 5px 14px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.filter-pill:hover { border-color: var(--border-str); color: var(--text-sec); }
+.filter-pill.active {
+  background: var(--brand-dim);
+  border-color: rgba(24,226,153,0.3);
+  color: var(--brand);
+}
+
+/* ============================================================
+   TASK ITEMS
+============================================================ */
+.task-list { display: flex; flex-direction: column; gap: 6px; }
+
+.task-item {
+  background: var(--surface-1);
+  border: 1px solid var(--border-sub);
+  border-radius: var(--r-md);
+  padding: 13px 14px 13px 16px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  transition: border-color 0.18s, opacity 0.25s, transform 0.2s;
+  animation: fadeSlideIn 0.22s ease;
+  position: relative;
+  overflow: hidden;
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.task-item:hover { border-color: var(--border-mid); }
+.task-item.is-done { opacity: 0.45; }
+.task-item.is-done .task-text { text-decoration: line-through; color: var(--text-muted); }
+
+/* Priority left indicator */
+.p-bar {
+  position: absolute;
+  left: 0; top: 12px; bottom: 12px;
+  width: 2px;
+  border-radius: 1px;
+}
+.p-bar.high   { background: var(--red); }
+.p-bar.medium { background: var(--amber); }
+.p-bar.low    { background: var(--blue); }
+
+/* Checkbox */
+.cb {
+  width: 18px; height: 18px;
+  border-radius: 5px;
+  border: 1.5px solid var(--border-str);
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.15s;
+}
+.cb:hover { border-color: var(--brand); background: var(--brand-dim); }
+.cb.checked {
+  background: var(--brand);
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px var(--brand-dim);
+}
+.cb.checked::after {
+  content: '';
+  width: 5px; height: 8px;
+  border: 2px solid #050a06;
+  border-top: none; border-left: none;
+  transform: rotate(45deg) translate(-0.5px, -1px);
+}
+
+.task-body { flex: 1; min-width: 0; }
+.task-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-pri);
+  line-height: 1.5;
+  word-break: break-word;
+}
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+.task-cat {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-sub);
+  border-radius: var(--r-pill);
+  padding: 1px 7px;
+}
+.task-time {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 0.2px;
+}
+.p-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.p-dot.high   { background: var(--red); }
+.p-dot.medium { background: var(--amber); }
+.p-dot.low    { background: var(--blue); }
+
+.task-actions {
+  display: flex; gap: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.task-item:hover .task-actions { opacity: 1; }
+
+.act-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  transition: color 0.12s, background 0.12s;
+  line-height: 1;
+  font-family: var(--sans);
+}
+.act-btn:hover { color: var(--text-sec); background: var(--surface-2); }
+.act-btn.del:hover { color: var(--red); }
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+.empty {
+  text-align: center;
+  padding: 48px 24px;
+  border: 1px dashed var(--border-mid);
+  border-radius: var(--r-lg);
+}
+.empty-ico { font-size: 36px; margin-bottom: 12px; opacity: 0.4; }
+.empty-ttl {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 5px;
+  letter-spacing: -0.2px;
+}
+.empty-sub { font-size: 12px; color: var(--text-dim); }
+
+/* ============================================================
+   HISTORY
+============================================================ */
+.history-group { margin-bottom: 28px; }
+.history-hd {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-sub);
+}
+.history-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-sec);
+  letter-spacing: 0.3px;
+  flex: 1;
+}
+.history-n {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--brand);
+  letter-spacing: 0.3px;
+}
+
+/* ============================================================
+   TOOLTIP
+============================================================ */
+.tooltip {
+  position: fixed;
+  background: var(--surface-2);
+  border: 1px solid var(--border-str);
+  border-radius: var(--r-sm);
+  padding: 7px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-sec);
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.12s;
+  white-space: nowrap;
+  box-shadow: var(--shadow-card);
+}
+.tooltip.on { opacity: 1; }
+
+/* ============================================================
+   MODAL
+============================================================ */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 500;
+  display: none;
+  place-items: center;
+  backdrop-filter: blur(6px);
+}
+.overlay.on { display: grid; }
+.modal {
+  background: var(--surface-1);
+  border: 1px solid var(--border-str);
+  border-radius: var(--r-lg);
+  padding: 28px;
+  width: 420px;
+  max-width: 90vw;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  animation: popIn 0.2s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: var(--shadow-card), 0 0 40px rgba(0,0,0,0.5);
+}
+@keyframes popIn {
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-hd {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+.modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-pri);
+  letter-spacing: -0.3px;
+}
+.modal-date {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+.modal-close {
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--r-pill);
+  padding: 4px 12px;
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+.modal-close:hover { border-color: var(--border-str); color: var(--text-pri); }
+.modal-body { overflow-y: auto; flex: 1; }
+
+/* ============================================================
+   TOAST
+============================================================ */
+.toast-wrap {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  display: flex; flex-direction: column;
+  gap: 8px; z-index: 9999;
+  pointer-events: none;
+}
+.toast {
+  background: var(--surface-2);
+  border: 1px solid var(--border-str);
+  border-radius: var(--r-pill);
+  padding: 10px 18px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-pri);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: toastIn 0.3s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: var(--shadow-card);
+}
+@keyframes toastIn {
+  from { opacity:0; transform:translateX(16px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+.toast.t-success { border-color: rgba(24,226,153,0.3); }
+.toast.t-streak  { border-color: rgba(245,166,35,0.3); }
+
+/* ============================================================
+   ALL DONE STATE
+============================================================ */
+.all-done {
+  text-align: center;
+  padding: 28px 24px;
+  background: linear-gradient(135deg, rgba(24,226,153,0.05), rgba(24,226,153,0.02));
+  border: 1px solid rgba(24,226,153,0.15);
+  border-radius: var(--r-lg);
+}
+.all-done-ico { font-size: 32px; margin-bottom: 8px; }
+.all-done-ttl { font-size: 14px; font-weight: 600; color: var(--brand); letter-spacing: -0.2px; margin-bottom: 3px; }
+.all-done-sub { font-size: 12px; color: var(--text-muted); }
+
+/* ============================================================
+   ADD CONTROLS WRAPPER (desktop)
+============================================================ */
+.add-controls {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   RESPONSIVE — Mobile First
+============================================================ */
+
+/* ── Touch: always show task actions ── */
+@media (hover: none) {
+  .task-actions { opacity: 1 !important; }
+}
+
+/* ── 640px breakpoint ── */
+@media (max-width: 640px) {
+
+  /* App shell */
+  .app { padding: 20px 14px 100px; }
+
+  /* Header */
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .header-meta { align-items: flex-start; }
+  .wordmark { font-size: 15px; }
+
+  /* Stats */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .stat-card { padding: 14px 13px; }
+  .stat-value { font-size: 26px; letter-spacing: -1px; }
+  .stat-label { font-size: 10px; margin-bottom: 6px; }
+  .stat-sub { font-size: 10px; }
+
+  /* Heatmap */
+  .heatmap-card { padding: 16px 14px; margin-bottom: 20px; }
+  .heatmap-title { font-size: 13px; }
+  .heatmap-subtitle { font-size: 10px; }
+
+  /* ── Add section — full redesign for mobile ── */
+  .add-section { margin-bottom: 18px; }
+
+  /* Outer pill becomes a column stack, no bg/border */
+  .add-row {
+    flex-direction: column;
+    gap: 8px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .add-row:focus-within {
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  /* Input becomes its own pill */
+  .add-input {
+    width: 100%;
+    background: var(--surface-1);
+    border: 1px solid var(--border-sub);
+    border-radius: var(--r-pill);
+    padding: 14px 18px;
+    font-size: 15px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .add-input:focus {
+    border-color: rgba(24,226,153,0.4);
+    box-shadow: 0 0 0 3px rgba(24,226,153,0.08);
+    outline: none;
+  }
+
+  /* Hide the outer divider between input & controls */
+  .add-row > .add-divider { display: none; }
+
+  /* Controls row: selects + button side by side */
+  .add-controls {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Hide inner divider between selects */
+  .inner-div { display: none; }
+
+  /* Each select: equal flex, pill shape */
+  .add-select {
+    flex: 1;
+    background: var(--surface-1);
+    border: 1px solid var(--border-sub);
+    border-radius: var(--r-pill);
+    padding: 11px 10px;
+    font-size: 13px;
+    color: var(--text-sec);
+    -webkit-appearance: none;
+    text-align: center;
+  }
+
+  /* Add button: fixed width, not full stretch */
+  .add-btn {
+    flex: 0 0 auto;
+    padding: 11px 18px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
+
+  /* Tabs — full width, equal columns */
+  .tab-row {
+    width: 100%;
+    border-radius: var(--r-lg);
+    margin-bottom: 18px;
+  }
+  .tab {
+    flex: 1;
+    text-align: center;
+    padding: 9px 8px;
+    font-size: 12px;
+  }
+
+  /* Filter pills — horizontal scroll, no wrap */
+  .filter-row {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .filter-row::-webkit-scrollbar { display: none; }
+  .filter-pill { flex-shrink: 0; }
+
+  /* Progress */
+  .progress-bar-wrap { padding: 16px 16px; }
+  .progress-pct { font-size: 22px; }
+
+  /* Task items — make actions always tappable */
+  .task-item { padding: 12px 10px 12px 14px; }
+  .task-actions {
+    opacity: 1;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .act-btn { padding: 5px 7px; font-size: 13px; }
+  .task-text { font-size: 13px; }
+
+  /* Section labels */
+  .section-label { font-size: 10px; }
+  .section-hd { margin-top: 16px; }
+
+  /* Modal — slide up from bottom on mobile */
+  .overlay { align-items: flex-end; }
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    padding: 20px 18px 32px;
+    max-height: 75vh;
+    animation: slideUp 0.25s cubic-bezier(0.4,0,0.2,1);
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Toast — bottom center */
+  .toast-wrap {
+    bottom: 20px;
+    right: 50%;
+    transform: translateX(50%);
+    align-items: center;
+    width: max-content;
+    max-width: 90vw;
+  }
+
+  /* Empty states */
+  .empty { padding: 36px 16px; }
+  .all-done { padding: 22px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tip"></div>
+
+<!-- Toast -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="modalTitle">Tasks</div>
+        <div class="modal-date" id="modalDate"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">Close</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-mark">
+        <div class="logo-mark-grid" id="logoGrid"></div>
+      </div>
+      <div class="wordmark">Commit<span>ly</span></div>
+    </div>
+    <div class="header-meta">
+      <div class="header-greeting" id="greeting"></div>
+      <div class="header-date" id="headerDate"></div>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card s-today">
+      <div class="stat-label">Today Done</div>
+      <div class="stat-value" id="sTodayN">0</div>
+      <div class="stat-sub" id="sTodaySub">of 0 tasks</div>
+    </div>
+    <div class="stat-card s-streak">
+      <div class="stat-label">🔥 Streak</div>
+      <div class="stat-value" id="sStreak">0</div>
+      <div class="stat-sub">days in a row</div>
+    </div>
+    <div class="stat-card s-total">
+      <div class="stat-label">All Time</div>
+      <div class="stat-value" id="sTotal">0</div>
+      <div class="stat-sub">tasks completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Best Streak</div>
+      <div class="stat-value" id="sBest">0</div>
+      <div class="stat-sub">days record</div>
+    </div>
+  </div>
+
+  <!-- HEATMAP -->
+  <div class="heatmap-card">
+    <div class="heatmap-top">
+      <div class="heatmap-title-wrap">
+        <div class="heatmap-title">Contribution Activity</div>
+        <div class="heatmap-subtitle" id="heatmapSub">— contributions in the last year</div>
+      </div>
+    </div>
+    <div class="heatmap-scroll">
+      <div class="heatmap-inner">
+        <div class="day-labels">
+          <div class="day-lbl"></div>
+          <div class="day-lbl">Mon</div>
+          <div class="day-lbl"></div>
+          <div class="day-lbl">Wed</div>
+          <div class="day-lbl"></div>
+          <div class="day-lbl">Fri</div>
+          <div class="day-lbl"></div>
+        </div>
+        <div class="heatmap-cols-wrap">
+          <div class="month-row" id="monthRow"></div>
+          <div class="heatmap-cols" id="heatmapCols"></div>
+        </div>
+      </div>
+    </div>
+    <div class="heatmap-footer">
+      <span class="legend-txt">Less</span>
+      <div class="leg-cell" style="background:var(--h0);border:1px solid var(--border-sub)"></div>
+      <div class="leg-cell" style="background:var(--h1)"></div>
+      <div class="leg-cell" style="background:var(--h2)"></div>
+      <div class="leg-cell" style="background:var(--h3)"></div>
+      <div class="leg-cell" style="background:var(--h4)"></div>
+      <span class="legend-txt">More</span>
+    </div>
+  </div>
+
+  <!-- QUICK ADD -->
+  <div class="add-section">
+    <div class="add-row" id="addRow">
+      <input class="add-input" id="taskInput"
+        placeholder="What do you need to do today?..."
+        maxlength="200" autocomplete="off">
+      <div class="add-divider"></div>
+      <div class="add-controls">
+        <select class="add-select" id="priSel">
+          <option value="none">Priority</option>
+          <option value="high">🔴 High</option>
+          <option value="medium">🟡 Medium</option>
+          <option value="low">🔵 Low</option>
+        </select>
+        <div class="add-divider inner-div"></div>
+        <select class="add-select" id="catSel">
+          <option value="general">General</option>
+          <option value="work">Work</option>
+          <option value="personal">Personal</option>
+          <option value="learning">Learning</option>
+          <option value="design">Design</option>
+          <option value="health">Health</option>
+        </select>
+        <button class="add-btn" id="addBtn">+ Add</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-row">
+    <button class="tab active" onclick="switchTab('today',this)">Today</button>
+    <button class="tab" onclick="switchTab('all',this)">All Tasks</button>
+    <button class="tab" onclick="switchTab('history',this)">History</button>
+  </div>
+
+  <!-- TAB: TODAY -->
+  <div id="pToday">
+    <div class="progress-bar-wrap">
+      <div class="progress-left">
+        <div class="progress-label">Today's Progress</div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progFill" style="width:0%"></div>
+        </div>
+      </div>
+      <div class="progress-pct" id="progPct">0%</div>
+    </div>
+
+    <div class="section-hd">
+      <div class="section-label">
+        Pending
+        <span class="count-badge" id="nPending">0</span>
+      </div>
+    </div>
+    <div class="task-list" id="listPending"></div>
+
+    <div class="section-hd">
+      <div class="section-label">
+        Completed
+        <span class="count-badge" id="nDone">0</span>
+      </div>
+    </div>
+    <div class="task-list" id="listDone"></div>
+  </div>
+
+  <!-- TAB: ALL -->
+  <div id="pAll" style="display:none">
+    <div class="filter-row">
+      <div class="filter-pill active" onclick="setFilter('all',this)">All</div>
+      <div class="filter-pill" onclick="setFilter('high',this)">🔴 High</div>
+      <div class="filter-pill" onclick="setFilter('medium',this)">🟡 Medium</div>
+      <div class="filter-pill" onclick="setFilter('low',this)">🔵 Low</div>
+      <div class="filter-pill" onclick="setFilter('work',this)">Work</div>
+      <div class="filter-pill" onclick="setFilter('design',this)">Design</div>
+      <div class="filter-pill" onclick="setFilter('personal',this)">Personal</div>
+    </div>
+    <div class="task-list" id="listAll"></div>
+  </div>
+
+  <!-- TAB: HISTORY -->
+  <div id="pHistory" style="display:none">
+    <div id="listHistory"></div>
+  </div>
+
+</div>
+
+<script>
+/* ============================================================
+   STORAGE
+============================================================ */
+const KEY = 'commitly_v2';
+function load() {
+  try { return JSON.parse(localStorage.getItem(KEY)) || { tasks:[], nid:1 }; }
+  catch { return { tasks:[], nid:1 }; }
+}
+function save() { localStorage.setItem(KEY, JSON.stringify(S)); }
+
+let S = load();
+let curTab = 'today';
+let curFilter = 'all';
+const tip = document.getElementById('tip');
+
+/* ============================================================
+   DATE HELPERS
+============================================================ */
+const ds = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const today = () => ds(new Date());
+const fmt = d => new Date(d+'T00:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});
+const fmtTime = ts => new Date(ts).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+const level = n => n===0?0:n<=2?1:n<=5?2:n<=9?3:4;
+
+/* ============================================================
+   STATS
+============================================================ */
+function stats() {
+  const t = today();
+  const tTasks = S.tasks.filter(x=>x.date===t);
+  const tDone  = tTasks.filter(x=>x.done).length;
+  const total  = S.tasks.filter(x=>x.done).length;
+
+  // Streak
+  const doneDays = new Set(S.tasks.filter(x=>x.done).map(x=>x.date));
+  let streak=0, c=new Date();
+  if (!doneDays.has(ds(c))) c.setDate(c.getDate()-1);
+  while (doneDays.has(ds(c))) { streak++; c.setDate(c.getDate()-1); }
+
+  // Best
+  const sorted = [...doneDays].sort();
+  let best=0, run=0, prev=null;
+  for (const d of sorted) {
+    const dt = new Date(d+'T00:00:00');
+    run = prev && (dt-prev)/86400000===1 ? run+1 : 1;
+    if (run>best) best=run;
+    prev=dt;
+  }
+
+  return { tDone, tTotal:tTasks.length, total, streak, best };
+}
+
+function renderStats() {
+  const s = stats();
+  document.getElementById('sTodayN').textContent   = s.tDone;
+  document.getElementById('sTodaySub').textContent = `of ${s.tTotal} task${s.tTotal!==1?'s':''}`;
+  document.getElementById('sStreak').textContent   = s.streak;
+  document.getElementById('sTotal').textContent    = s.total;
+  document.getElementById('sBest').textContent     = s.best;
+
+  const pct = s.tTotal===0 ? 0 : Math.round(s.tDone/s.tTotal*100);
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progPct').textContent  = pct+'%';
+  document.getElementById('nPending').textContent  = s.tTotal-s.tDone;
+  document.getElementById('nDone').textContent     = s.tDone;
+}
+
+/* ============================================================
+   HEATMAP
+============================================================ */
+function heatData() {
+  const m={};
+  S.tasks.filter(x=>x.done).forEach(x=>{ m[x.date]=(m[x.date]||0)+1; });
+  return m;
+}
+
+function renderHeatmap() {
+  const cols    = document.getElementById('heatmapCols');
+  const months  = document.getElementById('monthRow');
+  const data    = heatData();
+  const now     = new Date();
+  const todayS  = today();
+  const MONTHS  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  cols.innerHTML=''; months.innerHTML='';
+
+  const total = Object.values(data).reduce((a,b)=>a+b,0);
+  document.getElementById('heatmapSub').textContent =
+    `${total} contribution${total!==1?'s':''} in the last year`;
+
+  // Start 52 weeks ago, back to Sunday
+  const start = new Date(now);
+  start.setDate(start.getDate()-364-start.getDay());
+
+  let lastM=-1, cur=new Date(start);
+  while (cur<=now) {
+    const col=document.createElement('div');
+    col.className='heatmap-col';
+
+    // Month label
+    const m=cur.getMonth();
+    const ml=document.createElement('div');
+    ml.className='month-lbl';
+    ml.textContent = m!==lastM ? MONTHS[m] : '';
+    months.appendChild(ml);
+    if (m!==lastM) lastM=m;
+
+    // Pad first column
+    if (cols.children.length===0) {
+      for (let i=0;i<cur.getDay();i++) {
+        const g=document.createElement('div');
+        g.style.cssText='width:12px;height:12px;';
+        col.appendChild(g);
+      }
+    }
+
+    for (let d=0;d<7&&cur<=now;d++) {
+      const dstr=ds(cur);
+      const cnt=data[dstr]||0;
+      const lv=level(cnt);
+      const cell=document.createElement('div');
+      cell.className='cell'+(dstr===todayS?' is-today':'');
+      cell.id='cell-'+dstr;
+      cell.dataset.l=lv;
+      cell.dataset.d=dstr;
+      cell.dataset.n=cnt;
+      cell.addEventListener('mouseenter',e=>showTip(e,dstr,cnt));
+      cell.addEventListener('mouseleave',()=>hideTip());
+      cell.addEventListener('click',()=>openDayModal(dstr));
+      col.appendChild(cell);
+      cur.setDate(cur.getDate()+1);
+    }
+    cols.appendChild(col);
+  }
+}
+
+function showTip(e,dstr,cnt) {
+  tip.textContent = cnt===0
+    ? `No tasks · ${fmt(dstr)}`
+    : `${cnt} task${cnt>1?'s':''} completed · ${fmt(dstr)}`;
+  tip.classList.add('on');
+}
+function hideTip() { tip.classList.remove('on'); }
+document.addEventListener('mousemove',e=>{
+  if (!tip.classList.contains('on')) return;
+  tip.style.left=Math.min(e.clientX+14,window.innerWidth-tip.offsetWidth-8)+'px';
+  tip.style.top=(e.clientY-38)+'px';
+});
+
+function refreshCell(dstr) {
+  const cell=document.getElementById('cell-'+dstr);
+  if (!cell) return;
+  const data=heatData();
+  const cnt=data[dstr]||0;
+  cell.dataset.l=level(cnt);
+  cell.dataset.n=cnt;
+  const total=Object.values(data).reduce((a,b)=>a+b,0);
+  document.getElementById('heatmapSub').textContent=
+    `${total} contribution${total!==1?'s':''} in the last year`;
+}
+
+function pulseCell(dstr) {
+  const c=document.getElementById('cell-'+dstr);
+  if (!c) return;
+  c.classList.remove('do-pulse');
+  void c.offsetWidth;
+  c.classList.add('do-pulse');
+  setTimeout(()=>c.classList.remove('do-pulse'),800);
+}
+
+/* ============================================================
+   LOGO ANIMATION
+============================================================ */
+function animateLogo() {
+  const grid=document.getElementById('logoGrid');
+  grid.innerHTML='';
+  for (let i=0;i<9;i++) {
+    const d=document.createElement('div');
+    d.className='logo-mark-cell';
+    grid.appendChild(d);
+  }
+  const lit=[0,1,3,4,7,8];
+  lit.forEach((i,idx)=>{
+    setTimeout(()=>{ grid.children[i]?.classList.add('lit'); },idx*60);
+  });
+}
+
+/* ============================================================
+   TASK ELEMENT
+============================================================ */
+function makeTask(t, showDate=false) {
+  const el=document.createElement('div');
+  el.className='task-item'+(t.done?' is-done':'');
+  el.id='t-'+t.id;
+
+  const bar=document.createElement('div');
+  bar.className=`p-bar ${t.priority||'none'}`;
+  el.appendChild(bar);
+
+  const cb=document.createElement('div');
+  cb.className='cb'+(t.done?' checked':'');
+  cb.onclick=()=>toggleTask(t.id);
+  el.appendChild(cb);
+
+  const body=document.createElement('div');
+  body.className='task-body';
+
+  const txt=document.createElement('div');
+  txt.className='task-text';
+  txt.textContent=t.text;
+  body.appendChild(txt);
+
+  const meta=document.createElement('div');
+  meta.className='task-meta';
+
+  if (t.priority&&t.priority!=='none') {
+    const dot=document.createElement('div');
+    dot.className=`p-dot ${t.priority}`;
+    meta.appendChild(dot);
+  }
+  const cat=document.createElement('div');
+  cat.className='task-cat';
+  cat.textContent=t.category||'general';
+  meta.appendChild(cat);
+
+  const time=document.createElement('div');
+  time.className='task-time';
+  time.textContent=(showDate?t.date+' · ':'')+fmtTime(t.createdAt);
+  meta.appendChild(time);
+
+  body.appendChild(meta);
+  el.appendChild(body);
+
+  const acts=document.createElement('div');
+  acts.className='task-actions';
+  const del=document.createElement('button');
+  del.className='act-btn del';
+  del.textContent='✕';
+  del.onclick=()=>deleteTask(t.id);
+  acts.appendChild(del);
+  el.appendChild(acts);
+
+  return el;
+}
+
+/* ============================================================
+   RENDER VIEWS
+============================================================ */
+function renderToday() {
+  const t=today();
+  const all=S.tasks
+    .filter(x=>x.date===t)
+    .sort((a,b)=>({high:0,medium:1,low:2,none:3}[a.priority||'none'])-({high:0,medium:1,low:2,none:3}[b.priority||'none']));
+  const pend=all.filter(x=>!x.done);
+  const done=all.filter(x=>x.done);
+
+  const lp=document.getElementById('listPending');
+  const ld=document.getElementById('listDone');
+  lp.innerHTML=''; ld.innerHTML='';
+
+  if (all.length===0) {
+    lp.innerHTML=`<div class="empty"><div class="empty-ico">🌱</div><div class="empty-ttl">No tasks yet</div><div class="empty-sub">Add your first task and start the streak.</div></div>`;
+  } else {
+    if (pend.length===0) {
+      lp.innerHTML=`<div class="all-done"><div class="all-done-ico">✦</div><div class="all-done-ttl">All tasks completed today</div><div class="all-done-sub">Streak preserved. Take a breath.</div></div>`;
+    }
+    pend.forEach(t=>lp.appendChild(makeTask(t)));
+    done.forEach(t=>ld.appendChild(makeTask(t)));
+  }
+}
+
+function renderAll() {
+  const list=document.getElementById('listAll');
+  list.innerHTML='';
+  let tasks=[...S.tasks].sort((a,b)=>b.createdAt-a.createdAt);
+  if (curFilter!=='all') {
+    tasks=tasks.filter(t=>t.priority===curFilter||t.category===curFilter);
+  }
+  if (tasks.length===0) {
+    list.innerHTML=`<div class="empty"><div class="empty-ico">📭</div><div class="empty-ttl">No tasks found</div><div class="empty-sub">Try a different filter.</div></div>`;
+    return;
+  }
+  tasks.forEach(t=>list.appendChild(makeTask(t,true)));
+}
+
+function renderHistory() {
+  const el=document.getElementById('listHistory');
+  el.innerHTML='';
+  const done=S.tasks.filter(x=>x.done);
+  const byDay={};
+  done.forEach(x=>{ (byDay[x.date]=byDay[x.date]||[]).push(x); });
+  const days=Object.keys(byDay).sort().reverse();
+  if (days.length===0) {
+    el.innerHTML=`<div class="empty"><div class="empty-ico">📜</div><div class="empty-ttl">No history yet</div><div class="empty-sub">Complete tasks to see them here.</div></div>`;
+    return;
+  }
+  days.forEach(day=>{
+    const wrap=document.createElement('div');
+    wrap.className='history-group';
+    const hd=document.createElement('div');
+    hd.className='history-hd';
+    hd.innerHTML=`<div class="history-date">${fmt(day)}</div><div class="history-n">✓ ${byDay[day].length}</div>`;
+    wrap.appendChild(hd);
+    const tl=document.createElement('div');
+    tl.className='task-list';
+    byDay[day].forEach(t=>tl.appendChild(makeTask(t)));
+    wrap.appendChild(tl);
+    el.appendChild(wrap);
+  });
+}
+
+function renderView() {
+  renderStats();
+  if (curTab==='today') renderToday();
+  else if (curTab==='all') renderAll();
+  else renderHistory();
+}
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+function addTask() {
+  const inp=document.getElementById('taskInput');
+  const text=inp.value.trim();
+  if (!text) {
+    inp.style.color='var(--red)';
+    setTimeout(()=>inp.style.color='',600);
+    inp.focus(); return;
+  }
+  S.tasks.push({
+    id: S.nid++, text,
+    priority: document.getElementById('priSel').value,
+    category: document.getElementById('catSel').value,
+    date: today(), createdAt: Date.now(),
+    done: false, doneAt: null
+  });
+  save();
+  inp.value='';
+  document.getElementById('priSel').value='none';
+  renderView();
+  refreshCell(today());
+  toast('Task added','success');
+}
+
+function toggleTask(id) {
+  const t=S.tasks.find(x=>x.id===id);
+  if (!t) return;
+  const prev=stats().streak;
+  t.done=!t.done;
+  t.doneAt=t.done?Date.now():null;
+  save();
+  renderView();
+  refreshCell(t.date);
+  if (t.done) {
+    pulseCell(t.date);
+    const nw=stats().streak;
+    if (nw>prev&&nw>1) toast(`🔥 ${nw} day streak!`,'streak');
+    else toast('Task completed ✓','success');
+  }
+}
+
+function deleteTask(id) {
+  const t=S.tasks.find(x=>x.id===id);
+  const dstr=t?.date;
+  S.tasks=S.tasks.filter(x=>x.id!==id);
+  save();
+  renderView();
+  if (dstr) refreshCell(dstr);
+  toast('Task deleted','');
+}
+
+/* ============================================================
+   UI
+============================================================ */
+function switchTab(tab,btn) {
+  curTab=tab;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  ['today','all','history'].forEach(p=>{
+    document.getElementById('p'+p.charAt(0).toUpperCase()+p.slice(1)).style.display=p===tab?'':'none';
+  });
+  renderView();
+}
+
+function setFilter(f,el) {
+  curFilter=f;
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+
+function openDayModal(dstr) {
+  const tasks=S.tasks.filter(x=>x.date===dstr);
+  if (!tasks.length) return;
+  const done=tasks.filter(x=>x.done).length;
+  document.getElementById('modalTitle').textContent=`${done} of ${tasks.length} task${tasks.length!==1?'s':''} completed`;
+  document.getElementById('modalDate').textContent=fmt(dstr);
+  const body=document.getElementById('modalBody');
+  body.innerHTML='';
+  const tl=document.createElement('div');
+  tl.className='task-list';
+  tasks.forEach(t=>tl.appendChild(makeTask(t)));
+  body.appendChild(tl);
+  document.getElementById('overlay').classList.add('on');
+}
+function closeModal() { document.getElementById('overlay').classList.remove('on'); }
+document.getElementById('overlay').addEventListener('click',e=>{ if(e.target.id==='overlay') closeModal(); });
+
+function toast(msg, type='') {
+  const w=document.getElementById('toastWrap');
+  const t=document.createElement('div');
+  t.className='toast'+(type?' t-'+type:'');
+  t.textContent=msg;
+  w.appendChild(t);
+  setTimeout(()=>{ t.style.opacity='0'; t.style.transition='opacity 0.3s'; setTimeout(()=>t.remove(),300); },2400);
+}
+
+/* ============================================================
+   GREETING
+============================================================ */
+function greeting() {
+  const h=new Date().getHours();
+  return h<12?'Good morning ☀️':h<17?'Good afternoon ⚡':h<21?'Good evening 🌙':'Good night 🌑';
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+function init() {
+  animateLogo();
+  document.getElementById('greeting').textContent=greeting();
+  const now=new Date();
+  document.getElementById('headerDate').textContent=
+    now.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+  document.getElementById('taskInput').addEventListener('keydown',e=>{ if(e.key==='Enter') addTask(); });
+  document.getElementById('addBtn').addEventListener('click',addTask);
+
+  renderHeatmap();
+  renderView();
+
+  // Evening streak reminder
+  const h=new Date().getHours();
+  if (h>=20) {
+    const s=stats();
+    if (s.tDone===0&&s.streak>0) {
+      setTimeout(()=>toast(`🔥 Don't break your ${s.streak}-day streak!`,'streak'),1500);
+    }
+  }
+}
+
+init();
+</script>
+</body>
+</html>

@@ -86,18 +86,19 @@ body{
 /* ── HEATMAP CARD ── */
 .heatmap-card{background:var(--surface-1);border:1px solid var(--border-sub);border-radius:var(--r-lg);padding:24px;margin-bottom:28px;overflow:hidden;position:relative}
 .heatmap-card::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;background:radial-gradient(circle,rgba(24,226,153,0.06),transparent 70%);pointer-events:none}
-.heatmap-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:12px}
+.heatmap-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:12px}
+.heatmap-title-col{flex:1;min-width:0}
 .heatmap-title{font-size:14px;font-weight:600;color:var(--text-pri);letter-spacing:-0.2px;margin-bottom:3px}
 .heatmap-subtitle{font-family:var(--mono);font-size:11px;color:var(--text-muted)}
 
 /* View toggle */
-.heatmap-controls{display:flex;align-items:center;gap:8px;flex-shrink:0}
+/* heatmap-controls removed — view-toggle is now standalone */
 .view-toggle{display:flex;gap:2px;background:var(--surface-2);border:1px solid var(--border-sub);border-radius:var(--r-pill);padding:3px}
 .vt-btn{background:transparent;border:none;border-radius:var(--r-pill);padding:5px 12px;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--text-muted);cursor:pointer;transition:all 0.15s;text-transform:uppercase;letter-spacing:0.5px}
 .vt-btn.active{background:var(--surface-3);color:var(--brand);border:1px solid rgba(24,226,153,0.2)}
 
 /* Month navigation */
-.month-nav{display:none;align-items:center;gap:10px}
+.month-nav{display:none;align-items:center;gap:10px;margin-bottom:12px}
 .month-nav.show{display:flex}
 .mnav-btn{background:var(--surface-2);border:1px solid var(--border-sub);border-radius:var(--r-pill);width:28px;height:28px;display:grid;place-items:center;cursor:pointer;color:var(--text-sec);font-size:14px;transition:all 0.15s;flex-shrink:0}
 .mnav-btn:hover{border-color:var(--border-str);color:var(--text-pri)}
@@ -162,14 +163,14 @@ body{
 .add-section{margin-bottom:24px}
 .add-row{display:flex;gap:8px;align-items:center;background:var(--surface-1);border:1px solid var(--border-sub);border-radius:var(--r-pill);padding:6px 6px 6px 20px;transition:border-color 0.2s,box-shadow 0.2s}
 .add-row:focus-within{border-color:rgba(24,226,153,0.4);box-shadow:0 0 0 3px rgba(24,226,153,0.08)}
-.add-input{flex:1;background:transparent;border:none;outline:none;font-family:var(--sans);font-size:14px;font-weight:400;color:var(--text-pri);min-width:0;width:100%}
+.add-input{flex:1;background:transparent;border:none;outline:none;font-family:var(--sans);font-size:16px;font-weight:400;color:var(--text-pri);min-width:0;width:100%}
 .add-input::placeholder{color:var(--text-muted)}
 .add-divider{width:1px;height:18px;background:var(--border-mid);flex-shrink:0}
 .add-controls{display:flex;align-items:center;gap:0;flex-shrink:0}
-.add-select{background:transparent;border:none;outline:none;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--text-sec);cursor:pointer;padding:4px 8px;border-radius:var(--r-pill);transition:background 0.15s,color 0.15s;-webkit-appearance:none}
+.add-select{background:transparent;border:none;outline:none;font-family:var(--sans);font-size:16px;font-weight:500;color:var(--text-sec);cursor:pointer;padding:4px 8px;border-radius:var(--r-pill);transition:background 0.15s,color 0.15s;-webkit-appearance:none}
 .add-select:hover{background:var(--surface-2);color:var(--text-pri)}
 .add-select option{background:var(--surface-2);color:var(--text-pri)}
-.add-btn{background:var(--brand);color:#050a06;border:none;border-radius:var(--r-pill);padding:10px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:opacity 0.15s,transform 0.1s,box-shadow 0.2s;white-space:nowrap;letter-spacing:-0.1px;flex-shrink:0}
+.add-btn{touch-action:manipulation;background:var(--brand);color:#050a06;border:none;border-radius:var(--r-pill);padding:10px 22px;font-family:var(--sans);font-size:13px;font-weight:700;cursor:pointer;transition:opacity 0.15s,transform 0.1s,box-shadow 0.2s;white-space:nowrap;letter-spacing:-0.1px;flex-shrink:0}
 .add-btn:hover{opacity:0.88;box-shadow:0 4px 16px rgba(24,226,153,0.3)}
 .add-btn:active{transform:scale(0.96)}
 
@@ -212,7 +213,7 @@ body{
 
 .p-bar{position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:1px}
 .p-bar.high{background:var(--red)} .p-bar.medium{background:var(--amber)} .p-bar.low{background:var(--blue)}
-.cb{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-str);background:transparent;cursor:pointer;display:grid;place-items:center;flex-shrink:0;margin-top:1px;transition:all 0.15s}
+.cb{touch-action:manipulation;width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border-str);background:transparent;cursor:pointer;display:grid;place-items:center;flex-shrink:0;margin-top:1px;transition:all 0.15s}
 .cb:hover{border-color:var(--brand);background:var(--brand-dim)}
 .cb.checked{background:var(--brand);border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-dim)}
 .cb.checked::after{content:'';width:5px;height:8px;border:2px solid #050a06;border-top:none;border-left:none;transform:rotate(45deg) translate(-0.5px,-1px)}
@@ -303,12 +304,12 @@ body{
   .add-section{margin-bottom:18px}
   .add-row{flex-direction:column;gap:8px;padding:0;background:transparent;border:none;border-radius:0;box-shadow:none}
   .add-row:focus-within{border-color:transparent;box-shadow:none}
-  .add-input{width:100%;background:var(--surface-1);border:1px solid var(--border-sub);border-radius:var(--r-pill);padding:14px 18px;font-size:15px;transition:border-color 0.2s,box-shadow 0.2s}
+  .add-input{width:100%;background:var(--surface-1);border:1px solid var(--border-sub);border-radius:var(--r-pill);padding:14px 18px;font-size:16px;transition:border-color 0.2s,box-shadow 0.2s}
   .add-input:focus{border-color:rgba(24,226,153,0.4);box-shadow:0 0 0 3px rgba(24,226,153,0.08);outline:none}
   .add-row>.add-divider{display:none}
   .add-controls{width:100%;display:flex;gap:8px;align-items:center}
   .inner-div{display:none}
-  .add-select{flex:1;background:var(--surface-1);border:1px solid var(--border-sub);border-radius:var(--r-pill);padding:11px 10px;font-size:13px;color:var(--text-sec);-webkit-appearance:none;text-align:center}
+  .add-select{flex:1;background:var(--surface-1);border:1px solid var(--border-sub);border-radius:var(--r-pill);padding:11px 10px;font-size:16px;color:var(--text-sec);-webkit-appearance:none;text-align:center}
   .add-btn{flex:0 0 auto;padding:11px 18px;font-size:13px;white-space:nowrap}
   .tab-row{width:100%;border-radius:var(--r-lg);margin-bottom:16px}
   .tab{flex:1;text-align:center;padding:9px 8px;font-size:12px}
@@ -408,24 +409,22 @@ body{
 
   <!-- HEATMAP -->
   <div class="heatmap-card">
+    <!-- Row 1: title + view toggle -->
     <div class="heatmap-top">
-      <div>
+      <div class="heatmap-title-col">
         <div class="heatmap-title">Contribution Activity</div>
         <div class="heatmap-subtitle" id="heatmapSub">— contributions in the last year</div>
       </div>
-      <div class="heatmap-controls">
-        <!-- Month nav (visible in month mode) -->
-        <div class="month-nav" id="monthNav">
-          <button class="mnav-btn" onclick="shiftMonth(-1)">‹</button>
-          <div class="mnav-label" id="mnLabel" onclick="openChartModal()"></div>
-          <button class="mnav-btn" onclick="shiftMonth(1)">›</button>
-        </div>
-        <!-- View toggle -->
-        <div class="view-toggle">
-          <button class="vt-btn active" id="btnYear" onclick="setHeatView('year')">Year</button>
-          <button class="vt-btn" id="btnMonth" onclick="setHeatView('month')">Month</button>
-        </div>
+      <div class="view-toggle" style="flex-shrink:0">
+        <button class="vt-btn active" id="btnYear" onclick="setHeatView('year')">Year</button>
+        <button class="vt-btn" id="btnMonth" onclick="setHeatView('month')">Month</button>
       </div>
+    </div>
+    <!-- Row 2: month navigation (only visible in month mode) -->
+    <div class="month-nav" id="monthNav">
+      <button class="mnav-btn" onclick="shiftMonth(-1)">‹</button>
+      <div class="mnav-label" id="mnLabel" onclick="openChartModal()"></div>
+      <button class="mnav-btn" onclick="shiftMonth(1)">›</button>
     </div>
 
     <!-- Year view -->
@@ -677,7 +676,7 @@ function renderYearHeatmap() {
       cell.dataset.d=dstr; cell.dataset.n=cnt;
       cell.addEventListener('mouseenter',e=>showTip(e,dstr,cnt));
       cell.addEventListener('mouseleave',hideTip);
-      cell.addEventListener('click',()=>openDayModal(dstr));
+      cell.addEventListener('click',()=>{ const p=dstr.split('-'); openChartModal(new Date(+p[0],+p[1]-1,1)); });
       col.appendChild(cell);
       cur.setDate(cur.getDate()+1);
     }
@@ -740,7 +739,7 @@ function renderMonthHeatmap() {
     if (!isFuture) {
       cell.addEventListener('mouseenter',e=>showTip(e,dstr,cnt));
       cell.addEventListener('mouseleave',hideTip);
-      cell.addEventListener('click',()=>openDayModal(dstr));
+      cell.addEventListener('click',()=>{ const p=dstr.split('-'); openChartModal(new Date(+p[0],+p[1]-1,1)); });
     } else {
       cell.style.opacity='0.35';
       cell.style.cursor='default';

@@ -1,0 +1,145 @@
+{
+  "project_metadata": {
+    "name": "Commitly",
+    "type": "Single File SPA (Vanilla HTML, CSS, JS)",
+    "archetype": "Archetype 4 (Swiss & High-Contrast)",
+    "vibe": "Precision instrument, terminal-evolved, premium technical tool"
+  },
+  "typography": {
+    "imports": [
+      "https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;700;800&family=Manrope:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap"
+    ],
+    "families": {
+      "heading": "'Bricolage Grotesque', sans-serif",
+      "body": "'Manrope', sans-serif",
+      "mono": "'Space Mono', monospace"
+    },
+    "scales": {
+      "h1": "clamp(2rem, 5vw, 3.5rem)",
+      "h2": "clamp(1.5rem, 3vw, 2.5rem)",
+      "h3": "1.25rem",
+      "body": "1rem",
+      "small": "0.875rem",
+      "mono_numbers": "1.125rem"
+    },
+    "rules": [
+      "Headings must use tight tracking (letter-spacing: -0.02em)",
+      "Overlines, pills, and UI labels must be uppercase, Space Mono, tracking 0.1em",
+      "Numbers in stats, heatmaps, and pomodoro timer MUST use Space Mono"
+    ]
+  },
+  "color_system": {
+    "light_mode": {
+      "--bg-base": "#FAFAFA",
+      "--bg-surface": "#FFFFFF",
+      "--text-main": "#0A0A0A",
+      "--text-muted": "#525252",
+      "--border-color": "#E5E5E5",
+      "--accent-primary": "#FF4F00",
+      "--accent-hover": "#E64700",
+      "--heatmap-0": "#F5F5F5",
+      "--heatmap-1": "#FFD7C2",
+      "--heatmap-2": "#FFB085",
+      "--heatmap-3": "#FF8847",
+      "--heatmap-4": "#FF4F00",
+      "--danger": "#DC2626",
+      "--success": "#16A34A"
+    },
+    "dark_mode": {
+      "--bg-base": "#0A0A0A",
+      "--bg-surface": "#121212",
+      "--text-main": "#FAFAFA",
+      "--text-muted": "#A3A3A3",
+      "--border-color": "#262626",
+      "--accent-primary": "#FF4F00",
+      "--accent-hover": "#FF7333",
+      "--heatmap-0": "#171717",
+      "--heatmap-1": "#4A1A05",
+      "--heatmap-2": "#802A0A",
+      "--heatmap-3": "#BF3E0F",
+      "--heatmap-4": "#FF4F00",
+      "--danger": "#EF4444",
+      "--success": "#22C55E"
+    },
+    "rules": [
+      "Use CSS Variables strictly for all colors.",
+      "Light theme is default. Apply [data-theme='dark'] attribute on <html> or <body> for dark mode.",
+      "Accent primary is Vermilion (#FF4F00) — high energy, creates a beautiful streak/fire motif, contrasts beautifully with stark white and obsidian black."
+    ]
+  },
+  "spacing_system": {
+    "scale": {
+      "--space-1": "0.25rem",
+      "--space-2": "0.5rem",
+      "--space-3": "0.75rem",
+      "--space-4": "1rem",
+      "--space-6": "1.5rem",
+      "--space-8": "2rem",
+      "--space-12": "3rem"
+    },
+    "rules": [
+      "Generous padding inside surface containers. Use --space-6 or --space-8 for stat cards.",
+      "Any container with a border MUST have internal padding."
+    ]
+  },
+  "component_specs": {
+    "icons": {
+      "cdn": "<script src=\"https://unpkg.com/@phosphor-icons/web\"></script>",
+      "usage": "Use Phosphor Icons (e.g., <i class=\"ph ph-fire\"></i>). No emojis as icons."
+    },
+    "stat_cards": {
+      "style": "Sharp 0px border-radius, 1px solid var(--border-color), background var(--bg-surface).",
+      "typography": "Label in muted uppercase Space Mono, Value in bold Bricolage Grotesque.",
+      "layout": "Flex column, gap-2, padding-6."
+    },
+    "heatmap": {
+      "style": "Square cells, 2px border-radius (sharper than GitHub). Gap 4px between cells.",
+      "colors": "Bind cell background to var(--heatmap-X) based on contribution level."
+    },
+    "task_item": {
+      "style": "Flex row, items-center, 1px solid var(--border-color), background var(--bg-surface). Zero border-radius.",
+      "states": "Hover: border-color becomes var(--accent-primary). Completed: opacity 50%, text-decoration line-through on title.",
+      "swipe_gesture": "Reveal danger red background with trash icon on left swipe (mobile touch handling).",
+      "drag_handle": "Grid of 6 dots icon (ph-dots-six-vertical), cursor-grab, opacity 0.5."
+    },
+    "subtasks": {
+      "style": "Indented by 2rem, left border 2px solid var(--border-color) to indicate nesting.",
+      "font": "Body size scaled down to 0.875rem."
+    },
+    "pomodoro_timer": {
+      "style": "Inline per-task. Space Mono font for the countdown. Glowing Vermilion border when active.",
+      "controls": "Minimalist play/pause/stop icons from Phosphor."
+    },
+    "tabs_and_pills": {
+      "style": "Tabs: Unselected = transparent bg, muted text. Selected = var(--bg-surface), var(--accent-primary) bottom border 2px, main text color.",
+      "pills": "Fully rounded (9999px), 1px border, padding-x 12px, padding-y 4px, small Space Mono."
+    },
+    "achievements_badges": {
+      "style": "Geometric shapes (hexagons, diamonds) drawn with CSS clip-path or simple SVG inline. High contrast stroke var(--accent-primary), dark background."
+    },
+    "progress_bar": {
+      "style": "Height 4px, background var(--border-color). Fill is var(--accent-primary) with transition: width 0.5s ease-out."
+    }
+  },
+  "layout_guidance": {
+    "container": "Max-width 800px margin auto. The app should feel like a focused, centralized column even on ultra-wide screens.",
+    "header": "Sticky top, backdrop-filter blur(12px), background var(--bg-surface) with 80% opacity, 1px bottom border. Include Theme toggle icon here.",
+    "settings_drawer": "Fixed right or bottom depending on mobile/desktop. Slide in transform. Z-index 50. Blur backdrop."
+  },
+  "micro_interactions": {
+    "timing": "transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1)",
+    "hover": "Slight lift (transform: translateY(-2px)) on stat cards. Subtle background shift on buttons.",
+    "click": "Scale down to 0.98.",
+    "list_transitions": "When task is completed, delay removal (if filtered) by 300ms so user sees the strikethrough state."
+  },
+  "tech_stack_rules": {
+    "html_structure": "Must be exactly ONE file. <style> in <head>, HTML body, <script> at end of <body>.",
+    "libraries": [
+      "<script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script> (For Monthly Recap)",
+      "<script src=\"https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js\"></script> (For Drag & Drop)"
+    ]
+  },
+  "testing_rules": {
+    "requirements": "All interactive elements, buttons, inputs, tabs, modal triggers, and form submissions MUST have a `data-testid` attribute in kebab-case (e.g. data-testid=\"task-complete-checkbox\")."
+  }
+}

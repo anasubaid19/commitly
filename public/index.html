@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="Commitly — A precision productivity instrument. Track daily commits, build streaks, earn badges." />
+<meta name="theme-color" content="#0A0A0A" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Commitly" />
+<meta name="mobile-web-app-capable" content="yes" />
+<title>Commitly — Your Daily Commit</title>
+
+<link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Commitly","short_name":"Commitly","description":"Your Daily Commit","start_url":".","display":"standalone","background_color":"%230A0A0A","theme_color":"%23FF4F00","orientation":"portrait-primary","icons":[{"src":"data:image/svg+xml;utf8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 512 512%22%3E%3Crect width=%22512%22 height=%22512%22 fill=%22%230A0A0A%22/%3E%3Crect x=%2280%22 y=%2280%22 width=%22110%22 height=%22110%22 fill=%22%23FF4F00%22/%3E%3Crect x=%22210%22 y=%2280%22 width=%22110%22 height=%22110%22 fill=%22%23FF4F00%22/%3E%3Crect x=%2280%22 y=%22210%22 width=%22110%22 height=%22110%22 fill=%22%23FF4F00%22/%3E%3Crect x=%22340%22 y=%22340%22 width=%2290%22 height=%2290%22 fill=%22%23FF4F00%22/%3E%3C/svg%3E","sizes":"512x512","type":"image/svg+xml","purpose":"any maskable"}]}' />
+<link rel="icon" href='data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="%230A0A0A"/><rect x="10" y="10" width="14" height="14" fill="%23FF4F00"/><rect x="26" y="10" width="14" height="14" fill="%23FF4F00"/><rect x="10" y="26" width="14" height="14" fill="%23FF4F00"/><rect x="42" y="42" width="12" height="12" fill="%23FF4F00"/></svg>' />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;700;800&family=Manrope:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js" defer></script>
+
+<style>
+/* ============================================================
+   DESIGN TOKENS — Swiss & High-Contrast · Vermilion Accent
+============================================================ */
+:root {
+  --accent:          #FF4F00;
+  --accent-hover:    #E64700;
+  --accent-soft:     rgba(255, 79, 0, 0.10);
+  --accent-glow:     rgba(255, 79, 0, 0.35);
+  --danger:          #DC2626;
+  --warning:         #F59E0B;
+  --success:         #16A34A;
+  --info:            #2563EB;
+
+  /* Light (default) */
+  --bg:              #FAFAFA;
+  --surface:         #FFFFFF;
+  --surface-2:       #F5F5F5;
+  --surface-3:       #EBEBEB;
+  --text:            #0A0A0A;
+  --text-muted:      #525252;
+  --text-dim:        #A3A3A3;
+  --border:          #E5E5E5;
+  --border-strong:   #D4D4D4;
+  --h0:              #F5F5F5;
+  --h1:              #FFD7C2;
+  --h2:              #FFB085;
+  --h3:              #FF8847;
+  --h4:              #FF4F00;
+  --shadow:          0 1px 0 rgba(10,10,10,0.04), 0 8px 24px rgba(10,10,10,0.06);
+  --overlay:         rgba(10, 10, 10, 0.45);
+}
+html[data-theme='dark'] {
+  --bg:              #0A0A0A;
+  --surface:         #121212;
+  --surface-2:       #171717;
+  --surface-3:       #1F1F1F;
+  --text:            #FAFAFA;
+  --text-muted:      #A3A3A3;
+  --text-dim:        #525252;
+  --border:          #262626;
+  --border-strong:   #363636;
+  --h0:              #171717;
+  --h1:              #4A1A05;
+  --h2:              #802A0A;
+  --h3:              #BF3E0F;
+  --h4:              #FF4F00;
+  --shadow:          0 1px 0 rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.4);
+  --overlay:         rgba(0, 0, 0, 0.7);
+}
+
+/* Spacing */
+:root {
+  --s-1:.25rem; --s-2:.5rem; --s-3:.75rem; --s-4:1rem; --s-5:1.25rem;
+  --s-6:1.5rem; --s-8:2rem; --s-10:2.5rem; --s-12:3rem;
+  --font-display:'Bricolage Grotesque', sans-serif;
+  --font-body:'Manrope', system-ui, sans-serif;
+  --font-mono:'Space Mono', ui-monospace, monospace;
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   BASE
+============================================================ */
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+body {
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:15px;
+  line-height:1.55;
+  min-height:100vh;
+  min-height:100dvh;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  transition:background 0.25s var(--ease-smooth), color 0.25s var(--ease-smooth);
+}
+button,input,select,textarea { font-family:inherit; font-size:inherit; color:inherit; }
+button { cursor:pointer; background:none; border:none; }
+input,textarea { outline:none; }
+::selection { background:var(--accent); color:#fff; }
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:2px; }
+::-webkit-scrollbar-thumb:hover { background:var(--text-dim); }
+i[class^="ph"], i[class*=" ph"] { line-height:1; display:inline-flex; }
+
+.u-mono { font-family:var(--font-mono); letter-spacing:-0.02em; }
+.u-label { font-family:var(--font-mono); font-size:11px; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-muted); font-weight:700; }
+.u-display { font-family:var(--font-display); font-weight:800; letter-spacing:-0.03em; }
+
+/* ============================================================
+   APP LAYOUT
+============================================================ */
+.app {
+  max-width:880px;
+  margin:0 auto;
+  padding:0 var(--s-5) calc(var(--s-12) + env(safe-area-inset-bottom, 0px));
+}
+
+/* ── HEADER ── */
+.header {
+  position:sticky; top:0; z-index:30;
+  background:color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);
+  margin:0 calc(var(--s-5) * -1) var(--s-8);
+  padding:var(--s-4) var(--s-5);
+  display:flex; align-items:center; justify-content:space-between; gap:var(--s-4);
+}
+.brand { display:flex; align-items:center; gap:var(--s-3); }
+.brand-mark {
+  width:38px; height:38px;
+  background:var(--text); color:var(--bg);
+  display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr);
+  gap:2px; padding:5px;
+  flex-shrink:0;
+}
+.brand-mark span { background:var(--bg); transition:background 0.35s var(--ease-spring); }
+.brand-mark span.lit { background:var(--accent); }
+.brand-text { display:flex; flex-direction:column; line-height:1; }
+.brand-name { font-family:var(--font-display); font-weight:800; font-size:18px; letter-spacing:-0.03em; }
+.brand-name em { font-style:normal; color:var(--accent); }
+.brand-tag { font-family:var(--font-mono); font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.15em; margin-top:4px; }
+
+.header-tools { display:flex; align-items:center; gap:var(--s-2); }
+.icon-btn {
+  width:38px; height:38px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  color:var(--text);
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:18px;
+  transition:border-color 0.2s var(--ease-smooth), background 0.2s var(--ease-smooth), transform 0.1s var(--ease-smooth);
+  position:relative;
+}
+.icon-btn:hover { border-color:var(--accent); color:var(--accent); }
+.icon-btn:active { transform:scale(0.95); }
+.icon-btn.active { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+.icon-btn .badge-dot {
+  position:absolute; top:-3px; right:-3px;
+  width:10px; height:10px;
+  background:var(--accent); border:2px solid var(--bg);
+  border-radius:50%;
+}
+
+/* ============================================================
+   HERO / STATS
+============================================================ */
+.hero { margin-bottom:var(--s-8); }
+.hero-meta { display:flex; align-items:center; gap:var(--s-3); margin-bottom:var(--s-4); flex-wrap:wrap; }
+.hero-date { font-family:var(--font-mono); font-size:12px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.15em; }
+.hero-dot { width:6px; height:6px; background:var(--accent); }
+.hero-greeting { font-family:var(--font-mono); font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:0.15em; font-weight:700; }
+.hero-title {
+  font-family:var(--font-display); font-weight:800;
+  font-size:clamp(2rem, 5vw, 3rem);
+  line-height:1.05; letter-spacing:-0.04em;
+  margin-bottom:var(--s-2);
+}
+.hero-title .slash { color:var(--accent); }
+.hero-sub { color:var(--text-muted); max-width:520px; font-size:15px; }
+
+.stats { display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin-top:var(--s-6); border:1px solid var(--border); }
+.stat {
+  padding:var(--s-5);
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column; gap:var(--s-3);
+  min-width:0;
+  transition:background 0.2s var(--ease-smooth);
+  cursor:default;
+}
+.stat:last-child { border-right:none; }
+.stat:hover { background:var(--surface-2); }
+.stat-top { display:flex; align-items:center; justify-content:space-between; gap:var(--s-2); }
+.stat-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:var(--text-muted); }
+.stat-ico { font-size:14px; color:var(--text-dim); }
+.stat-value { font-family:var(--font-display); font-weight:800; font-size:clamp(1.75rem, 4vw, 2.5rem); letter-spacing:-0.04em; line-height:1; }
+.stat-sub { font-family:var(--font-mono); font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.1em; }
+.stat.is-accent .stat-value { color:var(--accent); }
+.stat.is-streak .stat-ico { color:var(--accent); }
+.stat.is-streak.has-fire .stat-value { color:var(--accent); }
+.stat.is-danger .stat-value { color:var(--danger); }
+.stat.is-danger.zero .stat-value { color:var(--text); }
+
+@media(max-width:680px) {
+  .stats { grid-template-columns:repeat(2,1fr); }
+  .stat:nth-child(1), .stat:nth-child(2) { border-bottom:1px solid var(--border); }
+  .stat:nth-child(2) { border-right:none; }
+  .stat:nth-child(3) { border-right:1px solid var(--border); }
+}
+
+/* ============================================================
+   SECTION
+============================================================ */
+.section { margin-bottom:var(--s-8); }
+.section-head {
+  display:flex; align-items:flex-end; justify-content:space-between;
+  gap:var(--s-4); margin-bottom:var(--s-4); flex-wrap:wrap;
+}
+.section-title-col { min-width:0; }
+.section-title { font-family:var(--font-display); font-weight:700; font-size:1.35rem; letter-spacing:-0.03em; }
+.section-sub { font-family:var(--font-mono); font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.12em; margin-top:var(--s-1); }
+
+/* ============================================================
+   HEATMAP
+============================================================ */
+.heatmap-card { background:var(--surface); border:1px solid var(--border); padding:var(--s-6); position:relative; overflow:hidden; }
+.heat-top { display:flex; align-items:center; justify-content:space-between; gap:var(--s-4); margin-bottom:var(--s-4); flex-wrap:wrap; }
+.view-toggle { display:inline-flex; border:1px solid var(--border); background:var(--bg); padding:3px; }
+.vt-btn {
+  padding:6px 14px;
+  font-family:var(--font-mono); font-size:10px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.15em;
+  color:var(--text-muted);
+  transition:all 0.15s var(--ease-smooth);
+}
+.vt-btn.active { background:var(--text); color:var(--bg); }
+.vt-btn:hover:not(.active) { color:var(--text); }
+
+.month-nav { display:none; align-items:center; gap:var(--s-3); margin-bottom:var(--s-4); }
+.month-nav.show { display:flex; }
+.mnav-btn { width:30px; height:30px; border:1px solid var(--border); background:var(--bg); display:grid; place-items:center; color:var(--text); font-size:16px; transition:all 0.15s var(--ease-smooth); }
+.mnav-btn:hover { border-color:var(--accent); color:var(--accent); }
+.mnav-label { font-family:var(--font-mono); font-weight:700; font-size:13px; letter-spacing:-0.01em; min-width:160px; text-align:center; cursor:pointer; text-transform:uppercase; }
+.mnav-label:hover { color:var(--accent); }
+
+.heat-scroll { overflow-x:auto; padding-bottom:var(--s-2); }
+.heat-inner { display:flex; gap:var(--s-2); min-width:max-content; }
+.day-labels { display:flex; flex-direction:column; padding-top:24px; gap:0; }
+.day-lbl { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); height:14px; line-height:14px; margin-bottom:3px; width:26px; text-align:right; padding-right:var(--s-2); text-transform:uppercase; letter-spacing:0.1em; }
+.month-row { display:flex; gap:3px; margin-bottom:6px; }
+.month-lbl { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); width:14px; text-transform:uppercase; letter-spacing:0.1em; overflow:visible; flex-shrink:0; font-weight:700; }
+.heat-cols { display:flex; gap:3px; }
+.heat-col { display:flex; flex-direction:column; gap:3px; }
+.cell { width:14px; height:14px; border-radius:2px; cursor:pointer; flex-shrink:0; transition:transform 0.12s var(--ease-smooth); }
+.cell:hover { transform:scale(1.4); z-index:5; position:relative; }
+.cell[data-l="0"] { background:var(--h0); border:1px solid var(--border); }
+.cell[data-l="1"] { background:var(--h1); }
+.cell[data-l="2"] { background:var(--h2); }
+.cell[data-l="3"] { background:var(--h3); }
+.cell[data-l="4"] { background:var(--h4); box-shadow:0 0 0 1px var(--accent-glow); }
+.cell.is-today { outline:2px solid var(--text); outline-offset:1px; }
+.cell.pulse { animation:cellPulse 0.7s var(--ease-spring); }
+@keyframes cellPulse { 0%{transform:scale(1)} 40%{transform:scale(2); box-shadow:0 0 14px var(--accent-glow)} 100%{transform:scale(1)} }
+
+.month-grid-wrap { display:none; }
+.month-grid-wrap.show { display:block; }
+.month-dow { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:6px; }
+.dow-lbl { font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--text-muted); text-align:center; text-transform:uppercase; letter-spacing:0.1em; padding:4px 0; }
+.month-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+.month-cell { background:var(--h0); border:1px solid var(--border); aspect-ratio:1/1; padding:6px; cursor:pointer; transition:all 0.15s var(--ease-smooth); display:flex; flex-direction:column; justify-content:space-between; min-height:54px; }
+.month-cell:hover:not(.empty) { border-color:var(--accent); transform:translateY(-1px); }
+.month-cell.empty { opacity:0; pointer-events:none; }
+.month-cell[data-l="1"] { background:var(--h1); }
+.month-cell[data-l="2"] { background:var(--h2); }
+.month-cell[data-l="3"] { background:var(--h3); }
+.month-cell[data-l="4"] { background:var(--h4); border-color:var(--accent); }
+.month-cell[data-l="3"] .mc-day,.month-cell[data-l="4"] .mc-day,.month-cell[data-l="3"] .mc-n,.month-cell[data-l="4"] .mc-n { color:#fff; }
+.month-cell.is-today { outline:2px solid var(--text); outline-offset:-1px; }
+.mc-day { font-family:var(--font-mono); font-size:11px; font-weight:700; color:var(--text-muted); }
+.mc-n { font-family:var(--font-display); font-weight:800; font-size:18px; color:var(--accent); align-self:flex-end; line-height:1; }
+.mc-n.zero { color:var(--text-dim); font-size:12px; font-weight:400; font-family:var(--font-mono); }
+
+.heat-foot { display:flex; align-items:center; justify-content:flex-end; gap:var(--s-2); margin-top:var(--s-4); }
+.legend-txt { font-family:var(--font-mono); font-size:9px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.12em; }
+.leg-c { width:11px; height:11px; border-radius:2px; }
+
+/* ============================================================
+   ADD TASK
+============================================================ */
+.add-card {
+  background:var(--surface); border:1px solid var(--border);
+  padding:var(--s-2);
+  display:grid; grid-template-columns:1fr auto auto auto; gap:var(--s-1);
+  align-items:center;
+  transition:border-color 0.2s var(--ease-smooth);
+}
+.add-card:focus-within { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+.add-input {
+  flex:1; border:none; outline:none; background:transparent;
+  font-family:var(--font-body); font-size:16px; font-weight:500;
+  padding:var(--s-3) var(--s-4);
+  min-width:0;
+}
+.add-input::placeholder { color:var(--text-dim); }
+.add-sel {
+  appearance:none; -webkit-appearance:none;
+  background:transparent; border:none;
+  padding:var(--s-2) var(--s-3);
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.1em;
+  color:var(--text-muted); cursor:pointer;
+  border-left:1px solid var(--border);
+  min-width:96px;
+}
+.add-sel:hover { color:var(--text); }
+.add-sel option { background:var(--surface); color:var(--text); text-transform:none; letter-spacing:normal; }
+.add-btn {
+  background:var(--accent); color:#fff;
+  padding:var(--s-3) var(--s-5);
+  font-family:var(--font-mono); font-weight:700; font-size:12px;
+  text-transform:uppercase; letter-spacing:0.1em;
+  display:inline-flex; align-items:center; gap:var(--s-2);
+  transition:background 0.15s var(--ease-smooth), transform 0.1s var(--ease-smooth);
+  white-space:nowrap;
+}
+.add-btn:hover { background:var(--accent-hover); }
+.add-btn:active { transform:scale(0.97); }
+.add-toggle-recurring {
+  padding:var(--s-2) var(--s-3);
+  border-left:1px solid var(--border);
+  color:var(--text-dim);
+  font-size:16px;
+  transition:color 0.15s var(--ease-smooth);
+}
+.add-toggle-recurring.on { color:var(--accent); }
+.add-toggle-recurring:hover { color:var(--text); }
+
+@media(max-width:640px) {
+  .add-card { grid-template-columns:1fr; gap:0; }
+  .add-input { border-bottom:1px solid var(--border); }
+  .add-sel, .add-toggle-recurring { border-left:none; border-top:1px solid var(--border); width:100%; text-align:left; padding:var(--s-3) var(--s-4); }
+  .add-btn { border-top:1px solid var(--border); padding:var(--s-4); justify-content:center; }
+  .add-row-controls { display:grid; grid-template-columns:1fr 1fr auto; gap:0; }
+  .add-row-controls .add-sel { border-right:1px solid var(--border); }
+}
+
+/* ============================================================
+   TABS
+============================================================ */
+.tab-bar {
+  display:flex; gap:0;
+  border-bottom:1px solid var(--border);
+  margin-bottom:var(--s-6); margin-top:var(--s-8);
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+.tab {
+  padding:var(--s-3) var(--s-5);
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.15em;
+  color:var(--text-muted);
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+  transition:all 0.18s var(--ease-smooth);
+  white-space:nowrap;
+  display:inline-flex; align-items:center; gap:var(--s-2);
+}
+.tab:hover { color:var(--text); }
+.tab.active { color:var(--text); border-bottom-color:var(--accent); }
+.tab i { font-size:14px; }
+.tab-count { font-family:var(--font-mono); font-size:10px; background:var(--surface-2); padding:2px 6px; margin-left:4px; color:var(--text-muted); font-weight:700; }
+.tab.active .tab-count { background:var(--accent); color:#fff; }
+
+/* ============================================================
+   SEARCH BAR
+============================================================ */
+.search-row { display:flex; align-items:center; gap:var(--s-2); margin-bottom:var(--s-4); }
+.search-box {
+  flex:1; display:flex; align-items:center; gap:var(--s-2);
+  background:var(--surface); border:1px solid var(--border);
+  padding:var(--s-2) var(--s-4);
+  transition:border-color 0.2s var(--ease-smooth);
+}
+.search-box:focus-within { border-color:var(--accent); }
+.search-box i { color:var(--text-dim); font-size:16px; }
+.search-box input {
+  flex:1; border:none; outline:none; background:transparent;
+  font-size:14px; padding:var(--s-2) 0;
+  min-width:0;
+}
+.search-box input::placeholder { color:var(--text-dim); }
+.search-clear { color:var(--text-dim); padding:var(--s-1); }
+.search-clear:hover { color:var(--danger); }
+
+/* ============================================================
+   PROGRESS
+============================================================ */
+.progress-card {
+  background:var(--surface); border:1px solid var(--border);
+  padding:var(--s-5);
+  display:flex; align-items:center; gap:var(--s-5);
+  margin-bottom:var(--s-5);
+}
+.progress-left { flex:1; min-width:0; }
+.progress-label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:var(--text-muted); margin-bottom:var(--s-3); }
+.progress-track { height:4px; background:var(--border); overflow:hidden; }
+.progress-fill { height:100%; background:var(--accent); transition:width 0.6s var(--ease-spring); }
+.progress-pct { font-family:var(--font-display); font-weight:800; font-size:2rem; letter-spacing:-0.03em; color:var(--accent); line-height:1; font-variant-numeric:tabular-nums; }
+
+/* ============================================================
+   SECTION LABEL + FILTER PILLS
+============================================================ */
+.sec-hd { display:flex; align-items:center; justify-content:space-between; gap:var(--s-3); margin:var(--s-6) 0 var(--s-3); flex-wrap:wrap; }
+.sec-hd:first-child { margin-top:0; }
+.sec-lbl { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:var(--text-muted); display:flex; align-items:center; gap:var(--s-2); }
+.sec-count { background:var(--surface-2); padding:2px 8px; font-size:10px; color:var(--text-muted); border:1px solid var(--border); }
+.sec-count.danger { background:rgba(220,38,38,0.08); border-color:rgba(220,38,38,0.25); color:var(--danger); }
+
+.filter-row { display:flex; gap:var(--s-2); flex-wrap:wrap; margin-bottom:var(--s-4); }
+.fpill {
+  padding:6px 14px;
+  border:1px solid var(--border);
+  background:var(--surface);
+  font-family:var(--font-mono); font-size:11px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.1em;
+  color:var(--text-muted);
+  border-radius:9999px;
+  transition:all 0.15s var(--ease-smooth);
+}
+.fpill:hover { color:var(--text); border-color:var(--text-dim); }
+.fpill.active { background:var(--text); color:var(--bg); border-color:var(--text); }
+
+/* ============================================================
+   TASK ITEM
+============================================================ */
+.task-list { display:flex; flex-direction:column; gap:var(--s-2); }
+.task-wrap { position:relative; overflow:hidden; background:var(--danger); }
+.task-wrap.is-drag-ghost { opacity:0.5; }
+.task-wrap.is-chosen .task-item { background:var(--surface-2); }
+
+.swipe-bg { position:absolute; inset:0; display:flex; align-items:center; padding:0 var(--s-5); font-family:var(--font-mono); font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.1em; font-size:11px; pointer-events:none; }
+.swipe-bg-del { background:var(--danger); justify-content:flex-end; }
+.swipe-bg-edit { background:var(--info); justify-content:flex-start; }
+.swipe-bg i { font-size:18px; margin:0 var(--s-2); }
+
+.task-item {
+  position:relative;
+  background:var(--surface);
+  border:1px solid var(--border);
+  padding:var(--s-4);
+  display:flex; align-items:flex-start; gap:var(--s-3);
+  transition:border-color 0.2s var(--ease-smooth), background 0.2s var(--ease-smooth), transform 0.2s var(--ease-spring);
+  touch-action:pan-y;
+  will-change:transform;
+}
+.task-item:hover { border-color:var(--text-dim); }
+.task-item.is-done { opacity:0.55; }
+.task-item.is-done .t-text { text-decoration:line-through; color:var(--text-muted); }
+.task-item.is-overdue { border-left:3px solid var(--danger); }
+.task-item.is-active-pomo { border-color:var(--accent); box-shadow:0 0 0 1px var(--accent), 0 0 24px var(--accent-glow); }
+
+.t-drag {
+  color:var(--text-dim); cursor:grab; font-size:18px; padding-top:2px;
+  opacity:0.5; transition:opacity 0.15s var(--ease-smooth);
+  display:none;
+}
+.task-item:hover .t-drag, .is-dragmode .t-drag { opacity:1; display:inline-flex; }
+
+.t-cb {
+  width:22px; height:22px; flex-shrink:0;
+  border:1.5px solid var(--border-strong);
+  display:grid; place-items:center;
+  cursor:pointer;
+  transition:all 0.18s var(--ease-smooth);
+  color:transparent; font-size:14px;
+  margin-top:1px;
+}
+.t-cb:hover { border-color:var(--accent); }
+.t-cb.checked { background:var(--accent); border-color:var(--accent); color:#fff; }
+.t-cb.checked:hover { background:var(--accent-hover); }
+
+.t-body { flex:1; min-width:0; display:flex; flex-direction:column; gap:var(--s-2); }
+.t-text { font-size:15px; font-weight:500; color:var(--text); word-break:break-word; line-height:1.4; }
+.t-text.editing { outline:1px solid var(--accent); background:var(--surface-2); padding:2px 6px; margin:-2px -6px; }
+.t-meta { display:flex; gap:var(--s-2); flex-wrap:wrap; align-items:center; font-size:11px; }
+.t-tag { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; padding:2px 7px; border:1px solid var(--border); color:var(--text-muted); display:inline-flex; align-items:center; gap:4px; }
+.t-tag.pri-high { color:var(--danger); border-color:rgba(220,38,38,0.3); }
+.t-tag.pri-medium { color:var(--warning); border-color:rgba(245,158,11,0.3); }
+.t-tag.pri-low { color:var(--info); border-color:rgba(37,99,235,0.3); }
+.t-tag.cat { background:var(--surface-2); }
+.t-tag.recurring { color:var(--accent); border-color:var(--accent); }
+.t-tag.time { color:var(--text-dim); border:none; padding:2px 0; }
+.t-details { font-size:13px; color:var(--text-muted); margin-top:2px; line-height:1.5; white-space:pre-wrap; word-break:break-word; }
+
+.t-actions { display:flex; gap:2px; align-items:center; flex-shrink:0; }
+.t-act {
+  width:30px; height:30px; display:grid; place-items:center;
+  color:var(--text-dim); font-size:15px;
+  transition:all 0.15s var(--ease-smooth);
+  border:1px solid transparent;
+}
+.t-act:hover { color:var(--accent); border-color:var(--border); background:var(--surface-2); }
+.t-act.danger:hover { color:var(--danger); border-color:rgba(220,38,38,0.3); }
+.t-act.is-running { color:var(--accent); background:var(--accent-soft); border-color:var(--accent); }
+
+/* Pomodoro timer inline */
+.pomodoro-bar {
+  display:none; align-items:center; gap:var(--s-3);
+  padding:var(--s-3) var(--s-4);
+  background:var(--surface-2);
+  border-top:1px solid var(--border);
+  margin:var(--s-4) calc(var(--s-4) * -1) calc(var(--s-4) * -1) calc(var(--s-4) * -1);
+  font-family:var(--font-mono);
+}
+.task-item.has-pomo-open .pomodoro-bar { display:flex; }
+.pomo-time { font-size:22px; font-weight:700; color:var(--accent); letter-spacing:-0.02em; font-variant-numeric:tabular-nums; min-width:80px; }
+.pomo-info { flex:1; font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); font-weight:700; }
+.pomo-sessions { color:var(--accent); }
+.pomo-ctrls { display:flex; gap:var(--s-1); }
+.pomo-btn { width:32px; height:32px; display:grid; place-items:center; border:1px solid var(--border-strong); background:var(--surface); color:var(--text); font-size:14px; transition:all 0.15s var(--ease-smooth); }
+.pomo-btn:hover { border-color:var(--accent); color:var(--accent); }
+.pomo-btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+.pomo-btn.primary:hover { background:var(--accent-hover); }
+
+/* Subtasks */
+.subtasks { margin-top:var(--s-3); padding-left:var(--s-5); border-left:2px solid var(--border); display:flex; flex-direction:column; gap:var(--s-2); }
+.subtask { display:flex; align-items:center; gap:var(--s-2); font-size:13px; }
+.subtask-cb { width:16px; height:16px; border:1.5px solid var(--border-strong); display:grid; place-items:center; cursor:pointer; color:transparent; font-size:10px; transition:all 0.15s var(--ease-smooth); flex-shrink:0; }
+.subtask-cb:hover { border-color:var(--accent); }
+.subtask-cb.done { background:var(--accent); border-color:var(--accent); color:#fff; }
+.subtask-text { flex:1; cursor:text; padding:2px 4px; margin:-2px -4px; border-radius:2px; }
+.subtask-text:hover { background:var(--surface-2); }
+.subtask-text.done { text-decoration:line-through; color:var(--text-dim); }
+.subtask-del { color:var(--text-dim); font-size:13px; opacity:0; transition:opacity 0.15s var(--ease-smooth); }
+.subtask:hover .subtask-del { opacity:1; }
+.subtask-del:hover { color:var(--danger); }
+.subtask-add { display:flex; align-items:center; gap:var(--s-2); }
+.subtask-add input { flex:1; border:none; border-bottom:1px dashed var(--border); background:transparent; font-size:13px; padding:4px 0; color:var(--text); }
+.subtask-add input::placeholder { color:var(--text-dim); }
+.subtask-progress { font-family:var(--font-mono); font-size:10px; color:var(--text-muted); background:var(--surface-2); border:1px solid var(--border); padding:2px 7px; font-weight:700; letter-spacing:0.08em; }
+
+/* Empty state */
+.empty-box {
+  border:1px dashed var(--border-strong);
+  padding:var(--s-8) var(--s-5);
+  text-align:center;
+  background:var(--surface);
+}
+.empty-ico { font-size:40px; color:var(--text-dim); margin-bottom:var(--s-3); display:inline-flex; }
+.empty-title { font-family:var(--font-display); font-weight:700; font-size:18px; margin-bottom:var(--s-2); letter-spacing:-0.02em; }
+.empty-desc { font-size:13px; color:var(--text-muted); max-width:360px; margin:0 auto; }
+
+/* Overdue banner */
+.overdue-banner {
+  background:rgba(220,38,38,0.06);
+  border:1px solid rgba(220,38,38,0.2);
+  border-left:3px solid var(--danger);
+  padding:var(--s-4);
+  margin-bottom:var(--s-4);
+  display:flex; align-items:center; gap:var(--s-3);
+}
+.overdue-banner i { color:var(--danger); font-size:20px; }
+.overdue-banner-text { flex:1; font-size:13px; }
+.overdue-banner-text strong { color:var(--danger); }
+.overdue-banner-btn { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:6px 12px; border:1px solid var(--danger); color:var(--danger); transition:all 0.15s var(--ease-smooth); }
+.overdue-banner-btn:hover { background:var(--danger); color:#fff; }
+
+/* History group */
+.history-group { margin-bottom:var(--s-6); }
+.history-date { display:flex; align-items:center; gap:var(--s-3); margin-bottom:var(--s-3); }
+.history-date-lbl { font-family:var(--font-mono); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--text); }
+.history-date-line { flex:1; height:1px; background:var(--border); }
+.history-date-count { font-family:var(--font-mono); font-size:10px; color:var(--accent); font-weight:700; }
+
+/* ============================================================
+   MODAL
+============================================================ */
+.modal-ov { position:fixed; inset:0; background:var(--overlay); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:grid; place-items:center; z-index:100; padding:var(--s-4); opacity:0; pointer-events:none; transition:opacity 0.25s var(--ease-smooth); }
+.modal-ov.open { opacity:1; pointer-events:auto; }
+.modal {
+  background:var(--bg); border:1px solid var(--border);
+  width:100%; max-width:520px; max-height:90vh; overflow-y:auto;
+  transform:translateY(20px) scale(0.98);
+  transition:transform 0.3s var(--ease-spring);
+  box-shadow:var(--shadow);
+}
+.modal-ov.open .modal { transform:translateY(0) scale(1); }
+.modal-hd { padding:var(--s-5); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; gap:var(--s-3); position:sticky; top:0; background:var(--bg); z-index:1; }
+.modal-title { font-family:var(--font-display); font-weight:800; font-size:20px; letter-spacing:-0.03em; }
+.modal-close { width:32px; height:32px; display:grid; place-items:center; color:var(--text-muted); font-size:18px; transition:all 0.15s var(--ease-smooth); border:1px solid transparent; }
+.modal-close:hover { border-color:var(--border); color:var(--danger); }
+.modal-body { padding:var(--s-5); display:flex; flex-direction:column; gap:var(--s-4); }
+.modal-foot { padding:var(--s-4) var(--s-5); border-top:1px solid var(--border); display:flex; gap:var(--s-2); justify-content:flex-end; background:var(--surface); }
+
+.field { display:flex; flex-direction:column; gap:var(--s-2); }
+.field label { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:var(--text-muted); }
+.field input[type=text], .field input[type=date], .field input[type=number], .field textarea, .field select {
+  background:var(--surface); border:1px solid var(--border);
+  padding:var(--s-3) var(--s-4);
+  font-size:14px; color:var(--text);
+  font-family:var(--font-body);
+  transition:border-color 0.15s var(--ease-smooth);
+  width:100%;
+}
+.field input:focus, .field textarea:focus, .field select:focus { border-color:var(--accent); outline:none; }
+.field textarea { resize:vertical; min-height:80px; font-family:var(--font-body); }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:var(--s-3); }
+@media(max-width:480px){.field-row{grid-template-columns:1fr}}
+
+.seg {
+  display:flex; border:1px solid var(--border);
+  overflow:hidden;
+}
+.seg button {
+  flex:1; padding:var(--s-3); font-family:var(--font-mono); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-muted); background:var(--surface); transition:all 0.15s var(--ease-smooth); border-right:1px solid var(--border);
+}
+.seg button:last-child { border-right:none; }
+.seg button.active { background:var(--text); color:var(--bg); }
+.seg button:hover:not(.active) { color:var(--text); }
+
+.btn {
+  padding:var(--s-3) var(--s-5);
+  font-family:var(--font-mono); font-weight:700; font-size:11px;
+  text-transform:uppercase; letter-spacing:0.12em;
+  border:1px solid var(--border-strong);
+  background:var(--surface);
+  color:var(--text);
+  transition:all 0.15s var(--ease-smooth);
+  display:inline-flex; align-items:center; gap:var(--s-2);
+}
+.btn:hover { border-color:var(--text); }
+.btn.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+.btn.primary:hover { background:var(--accent-hover); border-color:var(--accent-hover); }
+.btn.danger { color:var(--danger); border-color:rgba(220,38,38,0.4); }
+.btn.danger:hover { background:var(--danger); color:#fff; border-color:var(--danger); }
+.btn.ghost { background:transparent; border-color:var(--border); }
+
+/* ============================================================
+   SETTINGS DRAWER
+============================================================ */
+.drawer-ov { position:fixed; inset:0; background:var(--overlay); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:90; opacity:0; pointer-events:none; transition:opacity 0.25s var(--ease-smooth); }
+.drawer-ov.open { opacity:1; pointer-events:auto; }
+.drawer {
+  position:fixed; top:0; right:0; bottom:0;
+  width:100%; max-width:420px;
+  background:var(--bg); border-left:1px solid var(--border);
+  z-index:100;
+  transform:translateX(100%);
+  transition:transform 0.35s var(--ease-spring);
+  display:flex; flex-direction:column;
+  overflow-y:auto;
+}
+.drawer.open { transform:translateX(0); }
+.drawer-hd { padding:var(--s-5); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; background:var(--bg); z-index:1; }
+.drawer-body { padding:var(--s-5); display:flex; flex-direction:column; gap:var(--s-6); flex:1; }
+.drawer-section { display:flex; flex-direction:column; gap:var(--s-3); }
+.drawer-section-title { font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:var(--text-muted); padding-bottom:var(--s-2); border-bottom:1px solid var(--border); }
+.setting-row { display:flex; align-items:center; justify-content:space-between; gap:var(--s-3); padding:var(--s-2) 0; }
+.setting-row-info { display:flex; flex-direction:column; gap:2px; min-width:0; }
+.setting-row-label { font-size:14px; font-weight:600; }
+.setting-row-desc { font-size:12px; color:var(--text-muted); }
+.setting-row-ctrl { flex-shrink:0; }
+
+/* Toggle switch */
+.toggle {
+  position:relative; width:42px; height:24px;
+  background:var(--border-strong);
+  cursor:pointer; transition:background 0.2s var(--ease-smooth);
+  border-radius:9999px;
+}
+.toggle::after {
+  content:''; position:absolute; top:2px; left:2px;
+  width:20px; height:20px; background:#fff;
+  border-radius:50%;
+  transition:transform 0.25s var(--ease-spring);
+}
+.toggle.on { background:var(--accent); }
+.toggle.on::after { transform:translateX(18px); }
+
+/* ============================================================
+   ACHIEVEMENTS
+============================================================ */
+.achieve-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(110px, 1fr)); gap:var(--s-3); }
+.achieve-card {
+  background:var(--surface); border:1px solid var(--border);
+  padding:var(--s-4) var(--s-3);
+  text-align:center;
+  display:flex; flex-direction:column; align-items:center; gap:var(--s-2);
+  position:relative;
+  opacity:0.4;
+  transition:all 0.2s var(--ease-smooth);
+  cursor:default;
+}
+.achieve-card.unlocked { opacity:1; border-color:var(--accent); }
+.achieve-card.unlocked:hover { transform:translateY(-2px); box-shadow:0 6px 18px var(--accent-glow); }
+.achieve-hex {
+  width:54px; height:60px;
+  clip-path:polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  display:grid; place-items:center;
+  font-size:22px;
+  color:var(--text-dim);
+  position:relative;
+}
+.achieve-card.unlocked .achieve-hex {
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  box-shadow:0 0 0 2px var(--bg), 0 0 0 3px var(--accent);
+}
+.achieve-title { font-family:var(--font-display); font-weight:700; font-size:13px; letter-spacing:-0.02em; line-height:1.2; }
+.achieve-sub { font-family:var(--font-mono); font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; }
+
+/* Toast */
+.toast-wrap { position:fixed; bottom:var(--s-5); left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:var(--s-2); align-items:center; pointer-events:none; max-width:95%; }
+.toast {
+  background:var(--text); color:var(--bg);
+  padding:var(--s-3) var(--s-5);
+  font-family:var(--font-mono); font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.1em;
+  display:inline-flex; align-items:center; gap:var(--s-3);
+  box-shadow:var(--shadow);
+  transform:translateY(100px); opacity:0;
+  transition:all 0.3s var(--ease-spring);
+  pointer-events:none;
+  max-width:100%;
+}
+.toast.on { transform:translateY(0); opacity:1; }
+.toast.achievement { background:var(--accent); color:#fff; border:2px solid var(--text); }
+.toast i { font-size:18px; }
+
+/* Tooltip */
+.tooltip { position:fixed; background:var(--text); color:var(--bg); padding:5px 10px; font-family:var(--font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; pointer-events:none; z-index:1000; opacity:0; transition:opacity 0.12s; white-space:nowrap; }
+.tooltip.on { opacity:1; }
+
+/* Install prompt banner */
+.install-banner {
+  position:fixed; bottom:var(--s-4); left:50%; transform:translateX(-50%) translateY(120%);
+  z-index:95;
+  background:var(--text); color:var(--bg);
+  padding:var(--s-3) var(--s-4);
+  display:flex; align-items:center; gap:var(--s-3);
+  box-shadow:var(--shadow);
+  transition:transform 0.35s var(--ease-spring);
+  max-width:95%;
+}
+.install-banner.show { transform:translateX(-50%) translateY(0); }
+.install-banner-text { font-family:var(--font-mono); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; }
+.install-banner button { font-family:var(--font-mono); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; padding:6px 12px; }
+.install-banner .yes { background:var(--accent); color:#fff; }
+.install-banner .no { color:var(--bg); opacity:0.7; }
+
+/* Recap modal chart container */
+.recap-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:var(--s-3); margin-bottom:var(--s-4); }
+.recap-stat { text-align:center; padding:var(--s-3); border:1px solid var(--border); }
+.recap-stat-v { font-family:var(--font-display); font-weight:800; font-size:22px; letter-spacing:-0.03em; color:var(--accent); }
+.recap-stat-l { font-family:var(--font-mono); font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; font-weight:700; margin-top:2px; }
+.recap-chart-box { height:220px; position:relative; }
+
+/* Focus states */
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+
+/* Fade-in animation */
+@keyframes fadeUp { from { opacity:0; transform:translateY(8px) } to { opacity:1; transform:translateY(0) } }
+.fade-up { animation:fadeUp 0.35s var(--ease-spring) backwards; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- HEADER -->
+  <header class="header" data-testid="app-header">
+    <div class="brand">
+      <div class="brand-mark" id="brandMark" aria-hidden="true">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Commit<em>ly</em></span>
+        <span class="brand-tag">Your Daily Commit</span>
+      </div>
+    </div>
+    <div class="header-tools">
+      <button class="icon-btn" id="btnSearchToggle" aria-label="Toggle search" data-testid="btn-search-toggle" title="Search">
+        <i class="ph ph-magnifying-glass"></i>
+      </button>
+      <button class="icon-btn" id="btnThemeToggle" aria-label="Toggle theme" data-testid="btn-theme-toggle" title="Toggle theme">
+        <i class="ph ph-moon" id="themeIcon"></i>
+      </button>
+      <button class="icon-btn" id="btnSettings" aria-label="Open settings" data-testid="btn-settings" title="Settings">
+        <i class="ph ph-sliders-horizontal"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero fade-up" style="animation-delay:50ms">
+    <div class="hero-meta">
+      <span class="hero-date" id="heroDate">—</span>
+      <span class="hero-dot"></span>
+      <span class="hero-greeting" id="heroGreeting">Hello</span>
+    </div>
+    <h1 class="hero-title">Ship something<br>today<span class="slash">.</span></h1>
+    <p class="hero-sub">Small commits compound. Track every task, grow your streak, and watch your contribution grid light up — one day at a time.</p>
+
+    <!-- STATS -->
+    <div class="stats" id="statsGrid" data-testid="stats-grid">
+      <div class="stat is-accent">
+        <div class="stat-top">
+          <span class="stat-label">Today</span>
+          <i class="ph ph-check-circle stat-ico"></i>
+        </div>
+        <div class="stat-value" id="sToday" data-testid="stat-today">0</div>
+        <div class="stat-sub" id="sTodaySub">of 0 tasks</div>
+      </div>
+      <div class="stat is-streak">
+        <div class="stat-top">
+          <span class="stat-label">Streak</span>
+          <i class="ph ph-flame stat-ico"></i>
+        </div>
+        <div class="stat-value" id="sStreak" data-testid="stat-streak">0</div>
+        <div class="stat-sub" id="sStreakSub">days in a row</div>
+      </div>
+      <div class="stat" data-testid="stat-alltime">
+        <div class="stat-top">
+          <span class="stat-label">All-Time</span>
+          <i class="ph ph-trophy stat-ico"></i>
+        </div>
+        <div class="stat-value" id="sTotal" data-testid="stat-total">0</div>
+        <div class="stat-sub">completed</div>
+      </div>
+      <div class="stat is-danger zero" id="sOverdueCard">
+        <div class="stat-top">
+          <span class="stat-label">Overdue</span>
+          <i class="ph ph-warning-circle stat-ico"></i>
+        </div>
+        <div class="stat-value" id="sOverdue" data-testid="stat-overdue">0</div>
+        <div class="stat-sub">pending</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HEATMAP -->
+  <section class="section fade-up" style="animation-delay:150ms">
+    <div class="heatmap-card">
+      <div class="heat-top">
+        <div>
+          <div class="section-title">Contribution Grid</div>
+          <div class="section-sub" id="heatSub">0 contributions in the last year</div>
+        </div>
+        <div class="view-toggle" role="tablist">
+          <button class="vt-btn active" id="btnYear" data-testid="heatmap-year" role="tab">Year</button>
+          <button class="vt-btn" id="btnMonth" data-testid="heatmap-month" role="tab">Month</button>
+        </div>
+      </div>
+
+      <div class="month-nav" id="monthNav">
+        <button class="mnav-btn" id="prevMonth" data-testid="heatmap-prev-month" aria-label="Previous month"><i class="ph ph-caret-left"></i></button>
+        <div class="mnav-label" id="mnLabel" data-testid="heatmap-month-label" role="button" tabindex="0">—</div>
+        <button class="mnav-btn" id="nextMonth" data-testid="heatmap-next-month" aria-label="Next month"><i class="ph ph-caret-right"></i></button>
+      </div>
+
+      <div id="yearView">
+        <div class="heat-scroll" id="heatScroll">
+          <div class="heat-inner">
+            <div class="day-labels">
+              <div class="day-lbl"></div><div class="day-lbl">Mon</div>
+              <div class="day-lbl"></div><div class="day-lbl">Wed</div>
+              <div class="day-lbl"></div><div class="day-lbl">Fri</div>
+              <div class="day-lbl"></div>
+            </div>
+            <div>
+              <div class="month-row" id="monthRow"></div>
+              <div class="heat-cols" id="heatCols"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="month-grid-wrap" id="monthView">
+        <div class="month-dow">
+          <div class="dow-lbl">Sun</div><div class="dow-lbl">Mon</div>
+          <div class="dow-lbl">Tue</div><div class="dow-lbl">Wed</div>
+          <div class="dow-lbl">Thu</div><div class="dow-lbl">Fri</div>
+          <div class="dow-lbl">Sat</div>
+        </div>
+        <div class="month-grid" id="monthGrid"></div>
+      </div>
+
+      <div class="heat-foot">
+        <span class="legend-txt">Less</span>
+        <div class="leg-c" style="background:var(--h0); border:1px solid var(--border);"></div>
+        <div class="leg-c" style="background:var(--h1);"></div>
+        <div class="leg-c" style="background:var(--h2);"></div>
+        <div class="leg-c" style="background:var(--h3);"></div>
+        <div class="leg-c" style="background:var(--h4);"></div>
+        <span class="legend-txt">More</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEARCH BAR (hidden by default) -->
+  <div class="search-row" id="searchRow" style="display:none">
+    <div class="search-box">
+      <i class="ph ph-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="Search tasks by keyword…" data-testid="search-input" />
+      <button class="search-clear" id="searchClear" aria-label="Clear search" data-testid="search-clear"><i class="ph ph-x"></i></button>
+    </div>
+    <input type="date" id="searchFrom" class="u-mono" style="background:var(--surface);border:1px solid var(--border);padding:8px;font-size:12px;color:var(--text);max-width:140px" data-testid="search-date-from" />
+    <input type="date" id="searchTo" class="u-mono" style="background:var(--surface);border:1px solid var(--border);padding:8px;font-size:12px;color:var(--text);max-width:140px" data-testid="search-date-to" />
+  </div>
+
+  <!-- ADD TASK -->
+  <div class="add-card" id="addCard" data-testid="add-card">
+    <input class="add-input" id="taskInput" placeholder="What do you need to ship today?" maxlength="200" autocomplete="off" data-testid="input-task" />
+    <div class="add-row-controls" style="display:contents">
+      <select class="add-sel" id="priSel" data-testid="select-priority" aria-label="Priority">
+        <option value="none">Priority</option>
+        <option value="high">High</option>
+        <option value="medium">Medium</option>
+        <option value="low">Low</option>
+      </select>
+      <select class="add-sel" id="catSel" data-testid="select-category" aria-label="Category">
+        <option value="general">General</option>
+        <option value="work">Work</option>
+        <option value="personal">Personal</option>
+        <option value="learning">Learning</option>
+        <option value="design">Design</option>
+        <option value="health">Health</option>
+      </select>
+      <button class="add-toggle-recurring" id="recurringBtn" data-testid="btn-recurring" title="Toggle recurring daily" aria-label="Toggle recurring">
+        <i class="ph ph-repeat"></i>
+      </button>
+      <button class="add-btn" id="addBtn" data-testid="btn-add-task">
+        <i class="ph ph-plus"></i> Add
+      </button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar" role="tablist">
+    <button class="tab active" data-tab="today" data-testid="tab-today" role="tab"><i class="ph ph-sun"></i> Today <span class="tab-count" id="countToday">0</span></button>
+    <button class="tab" data-tab="all" data-testid="tab-all" role="tab"><i class="ph ph-list"></i> All Tasks <span class="tab-count" id="countAll">0</span></button>
+    <button class="tab" data-tab="history" data-testid="tab-history" role="tab"><i class="ph ph-clock-counter-clockwise"></i> History</button>
+    <button class="tab" data-tab="achievements" data-testid="tab-achievements" role="tab"><i class="ph ph-medal"></i> Badges <span class="tab-count" id="countAchieve">0</span></button>
+  </div>
+
+  <!-- TODAY PANEL -->
+  <div id="panelToday" class="panel">
+    <div id="overdueSection"></div>
+
+    <div class="progress-card">
+      <div class="progress-left">
+        <div class="progress-label">Today's Progress</div>
+        <div class="progress-track"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+      <div class="progress-pct" id="progPct" data-testid="progress-pct">0%</div>
+    </div>
+
+    <div class="sec-hd">
+      <div class="sec-lbl"><i class="ph ph-circle-dashed"></i> Pending <span class="sec-count" id="nPending">0</span></div>
+    </div>
+    <div class="task-list" id="listPending" data-testid="list-pending"></div>
+
+    <div class="sec-hd">
+      <div class="sec-lbl"><i class="ph ph-check-circle"></i> Completed <span class="sec-count" id="nDone">0</span></div>
+    </div>
+    <div class="task-list" id="listDone" data-testid="list-done"></div>
+  </div>
+
+  <!-- ALL PANEL -->
+  <div id="panelAll" class="panel" style="display:none">
+    <div class="filter-row" id="filterRow">
+      <button class="fpill active" data-filter="all">All</button>
+      <button class="fpill" data-filter="high">High</button>
+      <button class="fpill" data-filter="medium">Medium</button>
+      <button class="fpill" data-filter="low">Low</button>
+      <button class="fpill" data-filter="work">Work</button>
+      <button class="fpill" data-filter="design">Design</button>
+      <button class="fpill" data-filter="personal">Personal</button>
+      <button class="fpill" data-filter="health">Health</button>
+      <button class="fpill" data-filter="learning">Learning</button>
+      <button class="fpill" data-filter="recurring">Recurring</button>
+    </div>
+    <div class="task-list" id="listAll" data-testid="list-all"></div>
+  </div>
+
+  <!-- HISTORY PANEL -->
+  <div id="panelHistory" class="panel" style="display:none">
+    <div id="listHistory" data-testid="list-history"></div>
+  </div>
+
+  <!-- ACHIEVEMENTS PANEL -->
+  <div id="panelAchievements" class="panel" style="display:none">
+    <div class="section-head">
+      <div>
+        <div class="section-title">Badges Earned</div>
+        <div class="section-sub" id="achievementSub">—</div>
+      </div>
+    </div>
+    <div class="achieve-grid" id="achieveGrid" data-testid="achieve-grid"></div>
+  </div>
+</div>
+
+<!-- EDIT TASK MODAL -->
+<div class="modal-ov" id="editOv" data-testid="modal-edit">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="editTitle">
+    <div class="modal-hd">
+      <div class="modal-title" id="editTitle">Edit Task</div>
+      <button class="modal-close" id="editClose" aria-label="Close" data-testid="btn-edit-close"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label>Task</label>
+        <input type="text" id="edText" maxlength="200" data-testid="input-edit-text" />
+      </div>
+      <div class="field">
+        <label>Details / Notes</label>
+        <textarea id="edDetails" maxlength="2000" placeholder="Optional notes…" data-testid="input-edit-details"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Priority</label>
+          <select id="edPri" data-testid="select-edit-priority">
+            <option value="none">None</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Category</label>
+          <select id="edCat" data-testid="select-edit-category">
+            <option value="general">General</option>
+            <option value="work">Work</option>
+            <option value="personal">Personal</option>
+            <option value="learning">Learning</option>
+            <option value="design">Design</option>
+            <option value="health">Health</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label>Recurring</label>
+        <div class="seg" id="edRecSeg">
+          <button data-rec="none" class="active" type="button">None</button>
+          <button data-rec="daily" type="button">Daily</button>
+          <button data-rec="weekly" type="button">Weekly</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="edDate" data-testid="input-edit-date" />
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn danger" id="edDelete" data-testid="btn-edit-delete"><i class="ph ph-trash"></i> Delete</button>
+      <button class="btn ghost" id="edCancel" data-testid="btn-edit-cancel">Cancel</button>
+      <button class="btn primary" id="edSave" data-testid="btn-edit-save"><i class="ph ph-check"></i> Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECAP MODAL -->
+<div class="modal-ov" id="recapOv" data-testid="modal-recap">
+  <div class="modal" style="max-width:620px" role="dialog" aria-modal="true">
+    <div class="modal-hd">
+      <div class="modal-title" id="recapTitle">Monthly Recap</div>
+      <button class="modal-close" id="recapClose" aria-label="Close" data-testid="btn-recap-close"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="recap-stats">
+        <div class="recap-stat"><div class="recap-stat-v" id="rTotal">0</div><div class="recap-stat-l">Tasks Done</div></div>
+        <div class="recap-stat"><div class="recap-stat-v" id="rActive">0</div><div class="recap-stat-l">Active Days</div></div>
+        <div class="recap-stat"><div class="recap-stat-v" id="rBest">0</div><div class="recap-stat-l">Best Day</div></div>
+      </div>
+      <div class="recap-chart-box"><canvas id="recapChart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS DRAWER -->
+<div class="drawer-ov" id="drawerOv"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Settings">
+  <div class="drawer-hd">
+    <div class="modal-title">Settings</div>
+    <button class="modal-close" id="drawerClose" aria-label="Close settings" data-testid="btn-drawer-close"><i class="ph ph-x"></i></button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <div class="drawer-section-title">Appearance</div>
+      <div class="setting-row">
+        <div class="setting-row-info">
+          <div class="setting-row-label">Dark Mode</div>
+          <div class="setting-row-desc">Switch between light and dark themes</div>
+        </div>
+        <div class="toggle" id="tgDark" data-testid="toggle-dark"></div>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-title">Pomodoro</div>
+      <div class="setting-row">
+        <div class="setting-row-info">
+          <div class="setting-row-label">Focus Duration</div>
+          <div class="setting-row-desc">Minutes per focus session</div>
+        </div>
+        <input type="number" id="pomoFocus" min="1" max="120" style="width:70px;text-align:center;font-family:var(--font-mono);font-weight:700;background:var(--surface);border:1px solid var(--border);padding:6px;color:var(--text)" data-testid="input-pomo-focus" />
+      </div>
+      <div class="setting-row">
+        <div class="setting-row-info">
+          <div class="setting-row-label">Break Duration</div>
+          <div class="setting-row-desc">Minutes per break</div>
+        </div>
+        <input type="number" id="pomoBreak" min="1" max="60" style="width:70px;text-align:center;font-family:var(--font-mono);font-weight:700;background:var(--surface);border:1px solid var(--border);padding:6px;color:var(--text)" data-testid="input-pomo-break" />
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-title">Notifications</div>
+      <div class="setting-row">
+        <div class="setting-row-info">
+          <div class="setting-row-label">Browser Notifications</div>
+          <div class="setting-row-desc">Pomodoro alerts & reminders</div>
+        </div>
+        <div class="toggle" id="tgNotif" data-testid="toggle-notif"></div>
+      </div>
+      <div class="setting-row">
+        <div class="setting-row-info">
+          <div class="setting-row-label">Daily Reminder</div>
+          <div class="setting-row-desc">Ping if no task done by 8 PM</div>
+        </div>
+        <div class="toggle" id="tgDaily" data-testid="toggle-daily"></div>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-title">Data</div>
+      <div class="setting-row">
+        <div class="setting-row-info">
+          <div class="setting-row-label">Export Data</div>
+          <div class="setting-row-desc">Download a JSON backup</div>
+        </div>
+        <button class="btn" id="btnExport" data-testid="btn-export"><i class="ph ph-download-simple"></i> Export</button>
+      </div>
+      <div class="setting-row">
+        <div class="setting-row-info">
+          <div class="setting-row-label">Import Data</div>
+          <div class="setting-row-desc">Restore from JSON backup</div>
+        </div>
+        <button class="btn" id="btnImport" data-testid="btn-import"><i class="ph ph-upload-simple"></i> Import</button>
+        <input type="file" id="fileImport" accept=".json,application/json" style="display:none" />
+      </div>
+      <div class="setting-row">
+        <div class="setting-row-info">
+          <div class="setting-row-label">Install as App</div>
+          <div class="setting-row-desc">Add Commitly to your home screen</div>
+        </div>
+        <button class="btn" id="btnInstall" data-testid="btn-install" disabled><i class="ph ph-download"></i> Install</button>
+      </div>
+      <div class="setting-row">
+        <div class="setting-row-info">
+          <div class="setting-row-label">Clear All Data</div>
+          <div class="setting-row-desc">Reset everything — cannot be undone</div>
+        </div>
+        <button class="btn danger" id="btnWipe" data-testid="btn-wipe"><i class="ph ph-warning"></i> Reset</button>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-section-title">About</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">
+        <strong style="color:var(--text)">Commitly v4.0</strong><br>
+        A precision instrument for small daily commits. Data is stored locally in your browser. Export regularly to back up.
+      </div>
+    </div>
+  </div>
+</aside>
+
+<div class="tooltip" id="tip"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<div class="install-banner" id="installBanner">
+  <span class="install-banner-text">Install Commitly?</span>
+  <button class="yes" id="installYes">Install</button>
+  <button class="no" id="installNo">Not now</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
